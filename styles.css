@@ -19,6 +19,11 @@
 .price-type-toggle button{border:0;padding:5px 10px;font-size:13px;color:var(--muted);white-space:nowrap}
 .price-type-toggle button[aria-pressed=true]{background:var(--purple);color:var(--ink);font-weight:600}
 .price-value-field{margin-bottom:18px}
+.price-value-options{display:flex;align-items:stretch;gap:7px;margin-bottom:9px;max-width:100%}
+.price-value-options>.price-type-toggle{flex:0 1 auto;flex-wrap:nowrap;min-width:0;margin-bottom:0}
+.price-value-options .price-type-toggle button{min-width:0;white-space:normal;padding-inline:6px}
+.asterisk-toggle{flex:0 0 32px;padding:0;font-size:25px;line-height:1;min-height:38px;color:var(--muted)}
+.asterisk-toggle[aria-pressed=true]{background:var(--purple);border-color:var(--purple);color:var(--ink)}
 .price-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:18px}
 .price-heading h3{flex-shrink:0}
 .price-heading>.card-tools{margin:0;gap:4px}

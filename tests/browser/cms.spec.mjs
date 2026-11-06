@@ -159,10 +159,11 @@ test('Preus, colors, nous elements i notes obligatòries', async ({ page }) => {
 test('Format segur: negreta, cursiva, salts i enllaços', async ({ page }) => {
   const calls = await api(page); await page.goto('/'); await editHome(page, 'Text nou');
   const editor = page.getByRole('textbox', { name: 'Descripció', exact: true });
+  await expect(page.locator('.toolbar')).toHaveCount(0);
   await editor.focus(); await page.keyboard.press('ControlOrMeta+A');
-  await page.getByRole('button', { name: 'Negreta', exact: true }).click();
-  await page.getByRole('button', { name: 'Cursiva', exact: true }).click();
-  await page.getByRole('button', { name: 'Afegir enllaç', exact: true }).click();
+  await editor.press('ControlOrMeta+B');
+  await editor.press('ControlOrMeta+I');
+  await editor.press('ControlOrMeta+K');
   await page.getByLabel('Adreça', { exact: true }).fill('javascript:alert(1)');
   await page.getByRole('button', { name: 'Aplicar', exact: true }).click();
   await expect(page.locator('#link-error')).toBeVisible();
@@ -255,6 +256,12 @@ test('El commutador de preus limita els imports i permet text lliure', async ({ 
   const first = item.locator('.price').first(), second = item.locator('.price').nth(1);
   await expect(first.getByRole('button', { name: 'Import (€)', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(first.getByRole('button', { name: 'Text curt', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  await expect(item.getByRole('checkbox', { name: 'Negreta', exact: true })).toHaveCount(0);
+  await expect(item.getByRole('checkbox', { name: 'Cursiva', exact: true })).toHaveCount(0);
+  const star = first.getByRole('button', { name: 'Asterisc', exact: true });
+  await expect(star).toHaveAttribute('aria-pressed', 'true');
+  await star.click(); await expect(star).toHaveAttribute('aria-pressed', 'false');
+  await star.click(); await expect(star).toHaveAttribute('aria-pressed', 'true');
   const amount = first.getByRole('textbox', { name: 'Import (€)', exact: true });
   const description = first.getByRole('textbox', { name: 'Descripció (opcional)', exact: true });
   await expect(description).toBeVisible();
@@ -268,10 +275,16 @@ test('El commutador de preus limita els imports i permet text lliure', async ({ 
   await amount.fill('12.50');
   await second.getByRole('button', { name: 'Text curt', exact: true }).click();
   await expect(second.getByRole('button', { name: 'Text curt', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(second.getByRole('button', { name: 'Asterisc', exact: true })).toHaveCount(0);
+  await second.getByRole('button', { name: 'Import (€)', exact: true }).click();
+  await expect(second.getByRole('button', { name: 'Asterisc', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  await second.getByRole('button', { name: 'Text curt', exact: true }).click();
   await second.getByRole('textbox', { name: 'Text curt', exact: true }).fill('Consulta’ns: 12 € / a mida!');
   await acceptSave(page); await expect(page.locator('#save-state')).toContainText('Canvis guardats');
   expect(calls[0].body.document.categories[0].tables[0].items[0].prices[0].amount).toBe(1250);
+  expect(calls[0].body.document.categories[0].tables[0].items[0].prices[0].star).toBe(true);
   expect(calls[0].body.document.categories[0].tables[0].items[0].prices[1].text).toBe('Consulta’ns: 12 € / a mida!');
+  expect(calls[0].body.document.categories[0].tables[0].items[0].prices[1].star).toBe(false);
 });
 
 test('Categories numerades i edició directa de capçaleres sense desplegar-les', async ({ page }) => {
@@ -291,13 +304,15 @@ test('Categories numerades i edició directa de capçaleres sense desplegar-les'
   await expect(question.locator(':scope > summary .toolbar')).toHaveCount(0);
   await expect(question).not.toHaveAttribute('open', '');
   await question.locator(':scope > summary').press('Enter');
-  await expect(question.getByRole('button', { name: 'Negreta', exact: true })).toBeVisible();
+  const answer = question.getByRole('textbox', { name: 'Resposta', exact: true });
+  await answer.fill('Resposta amb format'); await answer.press('ControlOrMeta+A'); await answer.press('ControlOrMeta+B');
   await question.locator(':scope > summary').press('Enter');
   await acceptSave(page); await expect(page.locator('#result-message')).toContainText('Canvis guardats');
   const category = calls[0].body.document.categories[0];
   expect(category.tables[0].title).toBe('Taula editada directament');
   expect(category.tables[0].items[0].name).toBe('Ítem editat directament');
   expect(category.questions[0].question).toEqual([{ text: 'Pregunta editada directament?' }]);
+  expect(category.questions[0].answer).toEqual([{ text: 'Resposta amb format', bold: true }]);
 });
 
 test('La finestra de resultat es tanca manualment i mostra els KiB exactes mentre es manté polsada', async ({ page }) => {

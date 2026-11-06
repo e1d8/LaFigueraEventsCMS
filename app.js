@@ -155,18 +155,11 @@ function openLink(editor) {
 function richField(label, value, path, update, inline = false) {
   const tag = inline ? 'span' : 'div';
   const shell = el(tag, 'editor-wrap');
-  const toolbar = el(tag, 'toolbar'); toolbar.setAttribute('role', 'group'); toolbar.setAttribute('aria-label', `Format de ${label.toLowerCase()}`);
   const editor = el(tag, 'rich-editor'); editor.contentEditable = 'true'; editor.setAttribute('role', 'textbox');
   editor.setAttribute('aria-multiline', 'true'); editor.dataset.placeholder = 'Escriu ací…';
+  editor.setAttribute('aria-keyshortcuts', 'Control+B Meta+B Control+I Meta+I Control+K Meta+K');
   appendRich(editor, value);
   const command = name => { editor.focus(); document.execCommand('styleWithCSS', false, false); document.execCommand(name); editor.dispatchEvent(new Event('input', { bubbles: true })); };
-  for (const [name, text, title] of [['bold', 'B', 'Negreta'], ['italic', 'I', 'Cursiva'], ['link', 'Enllaç', 'Afegir enllaç'], ['unlink', 'Llevar enllaç', 'Llevar enllaç']]) {
-    const control = button(text, () => name === 'link' ? openLink(editor) : command(name));
-    control.setAttribute('aria-label', title); control.title = title;
-    if (name === 'bold') control.style.fontWeight = '600';
-    if (name === 'italic') control.style.fontStyle = 'italic';
-    control.addEventListener('mousedown', event => event.preventDefault()); toolbar.append(control);
-  }
   editor.addEventListener('beforeinput', event => {
     if (event.inputType === 'insertParagraph') { event.preventDefault(); document.execCommand('insertLineBreak'); }
   });
@@ -175,10 +168,13 @@ function richField(label, value, path, update, inline = false) {
   });
   editor.addEventListener('drop', event => event.preventDefault());
   editor.addEventListener('keydown', event => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openLink(editor); }
+    if (!event.metaKey && !event.ctrlKey || event.altKey) return;
+    const key = event.key.toLowerCase();
+    if (key === 'b' || key === 'i') { event.preventDefault(); command(key === 'b' ? 'bold' : 'italic'); }
+    if (key === 'k') { event.preventDefault(); if (event.shiftKey) command('unlink'); else openLink(editor); }
   });
   editor.addEventListener('input', () => { update(readRich(editor)); changed(); });
-  shell.append(toolbar, editor);
+  shell.append(editor);
   const wrapper = field(label, path, shell, inline);
   const caption = wrapper.querySelector('label'); caption.htmlFor = `${shell.id}-editor`; editor.id = caption.htmlFor;
   editor.setAttribute('aria-labelledby', `${shell.id}-label`); caption.id = `${shell.id}-label`;
@@ -254,10 +250,18 @@ function renderPrices(item, path) {
         if (price.kind === kind) return;
         price.kind = kind;
         if (kind === 'amount') { price.amount = 0; delete price.text; }
-        else { price.text = ''; delete price.amount; }
+        else { price.text = ''; price.star = false; delete price.amount; }
         changed(); render();
       });
       option.setAttribute('aria-pressed', String(price.kind === kind)); toggle.append(option);
+    }
+    const valueOptions = el('div', 'price-value-options'); valueOptions.append(toggle);
+    if (price.kind === 'amount') {
+      const star = button('*', () => {
+        price.star = !price.star; star.setAttribute('aria-pressed', String(price.star)); changed(); refreshFootnoteHint();
+      }, 'asterisk-toggle');
+      star.setAttribute('aria-label', 'Asterisc'); star.title = 'Asterisc'; star.setAttribute('aria-pressed', String(price.star));
+      valueOptions.append(star);
     }
     let valueField;
     if (price.kind === 'amount') {
@@ -285,10 +289,7 @@ function renderPrices(item, path) {
       valueField = field('Import (€)', `${pp}.amount`, input);
     } else valueField = textField('Text curt', price.text, `${pp}.text`, value => { price.text = value; }, 80);
     valueField.querySelector('label').classList.add('visually-hidden');
-    valueField.classList.add('price-value-field'); valueField.prepend(toggle); block.append(valueField);
-    const controls = el('div', 'price-controls');
-    controls.append(checkbox('Asterisc', price.star, value => { price.star = value; refreshFootnoteHint(); }), checkbox('Negreta', price.bold, value => { price.bold = value; }), checkbox('Cursiva', price.italic, value => { price.italic = value; }));
-    block.append(controls);
+    valueField.classList.add('price-value-field'); valueField.prepend(valueOptions); block.append(valueField);
     const pending = pendingControl(price); if (pending) block.append(pending);
     container.append(block);
   });
