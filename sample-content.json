@@ -1,0 +1,1169 @@
+{
+  "schemaVersion": 1,
+  "home": {
+    "description": [
+      {
+        "text": "Primer que res… "
+      },
+      {
+        "text": "ENHORABONA!",
+        "bold": true
+      },
+      {
+        "text": "\n\nAcí teniu una relació de possibilitats de tortades meravelloses per tal que el vostre dia siga el més dolç possible, així com opcions de bufets de tartes per quedar-vos amb tota la vostra gent o taules dolces figtàstiques."
+      }
+    ]
+  },
+  "contact": {
+    "label": "Contacte",
+    "description": [
+      {
+        "text": "Moltes gràcies per pensar amb nosaltres! Si teniu qualsevol dubte, contacteu-nos per qualsevol d’aquests mitjans:"
+      }
+    ]
+  },
+  "contacts": {
+    "whatsapp": {
+      "text": "649656652",
+      "href": "https://wa.me/34649656652"
+    },
+    "email": {
+      "text": "lafigueravlc@gmail.com",
+      "href": "mailto:lafigueravlc@gmail.com"
+    },
+    "instagram": {
+      "text": "@lafigueravlc",
+      "href": "https://www.instagram.com/lafigueravlc/"
+    }
+  },
+  "categories": [
+    {
+      "id": "tartes-nupcials",
+      "label": "Tartes nupcials",
+      "description": [
+        {
+          "text": "Totes les nostres tartes són "
+        },
+        {
+          "text": "100% artesanals",
+          "bold": true
+        },
+        {
+          "text": ", (no usem cap crema ni preparació industrial) utilitzem productes de "
+        },
+        {
+          "text": "proximitat i de temporada",
+          "bold": true
+        },
+        {
+          "text": " i decorem amb tot l’amor mundial cada pastís utilitzant elements naturals, "
+        },
+        {
+          "text": "flors i fruita fresca",
+          "bold": true
+        },
+        {
+          "text": " coherent cromàticament amb la decoració de tot l’event, pel que la vostra tortada va a ser única i irrepetible. I, com que som un obrador familiar, "
+        },
+        {
+          "text": "NO AGAFEM MÉS D’UN EVENT PER DATA",
+          "bold": true
+        },
+        {
+          "text": " per poder dedicar tot el nostre temps al vostre dia."
+        }
+      ],
+      "tables": [
+        {
+          "title": "Les clàssiques:",
+          "footnote": [
+            {
+              "text": "Preu sense IVA. No incloem transport. Els productes s’han d’arreplegar a l’obrador."
+            }
+          ],
+          "items": [
+            {
+              "name": "Carrot cake",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "Biscuit de carlota espècies amb crema de tormatge fruits secs."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 16500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 39000,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Pastís de xocolate",
+              "color": "purple",
+              "description": [
+                {
+                  "text": "biscuit de vainilla mullat amb café, crema de xoco amb llet (o xoco pur, vosaltres trieu!)"
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 16500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 39000,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Pastís de llima",
+              "color": "green",
+              "description": [
+                {
+                  "text": "biscuit de llima humit amb crema de formatge i xoco blanc i coulis de fruita (trieu la vostra preferida!)"
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 16500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 39000,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Pastís de lotus",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "Biscuit de xocolata banyat amb café buttercream de la famosa galeta lotus."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 16500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 39000,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Les premium:",
+          "footnote": [
+            {
+              "text": "Preu sense IVA. No incloem transport. Els productes s’han d’arreplegar a l’obrador."
+            }
+          ],
+          "items": [
+            {
+              "name": "Fruits secs i dulce de leche",
+              "color": "purple",
+              "description": [
+                {
+                  "text": "Tarta de biscuit de xoco banyat amb café, buttercream de dulce de leche, fruits secs i crunch d'avellana."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 18500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 43500,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Praliné d’avellanes",
+              "color": "green",
+              "description": [
+                {
+                  "text": "Biscuit de vainilla, crema de xocolate amb llet, praliné d’avellanes casolà, crunch avellana."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 18500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 43500,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Macadàmia",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "Biscuit llima humit, crema de formatge i xoco blanc, anous de macadàmia caramelitzades."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 18500,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 43500,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Tartes marquesa:",
+          "footnote": [
+            {
+              "text": "Preu sense IVA. No incloem transport. Els productes s’han d’arreplegar a l’obrador."
+            }
+          ],
+          "items": [
+            {
+              "name": "Carabassa i pistatxo",
+              "color": "purple",
+              "description": [
+                {
+                  "text": "Biscuit de carabassa, buttercream de pistatxo, crunch de pistatxo caramelitzat."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 20000,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 47500,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Gerds, formatge i pistatxo",
+              "color": "green",
+              "description": [
+                {
+                  "text": "Biscuit de vainilla, buttecream de formatge i xoco blanc, coulis casolà de frambueses, crunch de pistatxo caramelitzat."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 20000,
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 47500,
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "Personalitzada",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "Acorda una cita amb nosaltres i dissenyem la teua tarta ideal basada en les teues postres preferides!"
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "text",
+                  "text": "Contacta’ns i et fem preu!",
+                  "description": [
+                    {
+                      "text": "2 pisos (35/37 porcions)"
+                    }
+                  ],
+                  "star": false,
+                  "bold": false,
+                  "italic": false
+                },
+                {
+                  "kind": "text",
+                  "text": "Contacta’ns i et fem preu!",
+                  "description": [
+                    {
+                      "text": "3 pisos (85/87 porcions)"
+                    }
+                  ],
+                  "star": false,
+                  "bold": false,
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "question": [
+            {
+              "text": "Què inclou el preu?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "El preu inclou una reunió presencial o per telemàtica per tal de coneixer-nos i veure quines són les vostres preferències/gustos, assessorament personal i la tortada nupcial. No inclou el muntatge de cap taula dolça ni el transport. Es pot fer una prova amb dos sabors distints del mateix preu o gama abans de la cerimònia que inclouria dues tartes (cadascuna del seu sabor corresponent) d’unes 6/8 racions per "
+            },
+            {
+              "text": "50€",
+              "bold": true
+            },
+            {
+              "text": ". (Els preus es presenten sense el 21% d’IVA)"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Com es decoren?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Totes les tartes es poden decorar amb fruita, flors, o una combinació de les dues. Podem posar-nos en contacte amb la persona encarregada de les flors per tal que el pastís tinga la mateixa decoració que la resta de la celebració. Ens podem reunir i veure diferents dissenys per trobar la vostra tortada ideal. Contacta’ns i ho organitzem! (Hi haurà un recàrrec si hem de fer-nos càrrec de comprar flors a conjunt amb l’event, tot i que moltes vegades es pot demanar de manera gratuïta que la persona encarregada deixe una bossa amb flors per tal de decorar el pastís)."
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Feu tartes de fondant?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "No. No és la nostra especialitat. Nosaltres ens centrem en un tipus de tarta natural, amb fruita fresca, fruits secs, brots, fulles i flors comestibles. Tot i això, podem adaptar el disseny a les vostres preferències."
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "La tarta pot ser blanca encara que triem una de xocolata o lotus?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Sense problema. Tot i què algunes cremes siguen obscures, podem fer una crema distinta per a l’exterior de la tarta i que quede del color que trieu :)"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Teniu opcions adaptades per a intoleràncies?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Sí! Es poden adaptar pastissos sense gluten, sense lactosa, vegans, sense sucre... Contacta’ns per veure quines necessitats teniu i quines possibilitats podem oferir-vos."
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Els 3 pisos de la tortada han de ser iguals?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "No cal. Les tortades nupcials es poden fer combinant sabors (que cada pis de la tarta tinga un sabor destint) per un suplement de "
+            },
+            {
+              "text": "20€",
+              "bold": true
+            },
+            {
+              "text": ". No es podran fer combinacions de sabors de tartes de diferent preu (per exemple, es pot fer una tarta de tres pisos amb carrot cake, tarta de xoco i tarta de llima, però no es podría incloure a aquest pastís una de pistatxo i carabassa)."
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Què passa si som més de 85 persones?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Fem una tortada nupcial per a les fotografies i el record de tallar-la, però després oferim tartes d’uns 20cm de diàmetre i uns 10/12cm d’altura (4 capes de biscuit) que donen unes 25 porcions fins que tothom tinga pastís. El preu de cada tarta extra és de "
+            },
+            {
+              "text": "50€",
+              "bold": true
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Ens porteu vosaltres les tortades?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Pel moment no tenim un transport adaptat al transport dels nostres productes, pel que caldria arreplegar-los a l’obrador. Sí podem posar-nos en contacte amb la sala per veure si podem buscar una solució i oferim el servei de muntatge tant de taula com de decoració dels pastissos in situ per un suplement. Pregunteu-nos i ho aclarim!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bufet-de-tortades",
+      "label": "Bufet de tortades",
+      "description": [
+        {
+          "text": "Com ja sabeu, som un obrador especialitzat en tartes de formatge, pel que oferim l’opció de montar, en compte d’una taula dolça, una taula de tartes de formatge dels sabors que trieu i que vos adjuntem a continuació. Aquesta és una opció perfecta perquè la vostra gent puga triar i servir-se el que vulga quan vulga (com entra un tros de pastís de resopó…?)"
+        }
+      ],
+      "tables": [
+        {
+          "title": "Bufet de tortades",
+          "footnote": [
+            {
+              "text": "Preu sense IVA. No incloem transport. Els productes s’han d’arreplegar a l’obrador."
+            }
+          ],
+          "items": [
+            {
+              "name": "LA FAVORITA",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "Amb un toc de "
+                },
+                {
+                  "text": "formatge blau",
+                  "bold": true
+                },
+                {
+                  "text": " d’Auvergne DOP, base de galeta lotus, figues i mel, pistatxos (adaptable a la fruita de temporada)."
+                }
+              ],
+              "alert": [
+                {
+                  "text": "SAP A FORMATGE"
+                }
+              ],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "PARMIGIANA",
+              "color": "purple",
+              "description": [
+                {
+                  "text": "De "
+                },
+                {
+                  "text": "parmesà",
+                  "bold": true
+                },
+                {
+                  "text": ", base de galeta maria i fruits secs caramelitzats, "
+                },
+                {
+                  "text": "raïm",
+                  "bold": true
+                },
+                {
+                  "text": " fresc (adaptable a la fruita de temporada)."
+                }
+              ],
+              "alert": [
+                {
+                  "text": "SAP A FORMATGE"
+                }
+              ],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "MATÓ I MEL",
+              "color": "green",
+              "description": [
+                {
+                  "text": "SUAU I CREMOSA:\n\nDe mató, llima, base de galeta maria, fruita de temporada fresca, mel."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "LA VALENCIANA",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "SUAU I CREMOSA:\nBase de galeta maria amb llima, crema casolana de llima de la terreta, merenga suuuperlleugera i cremosa."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "XOCO BLANC",
+              "color": "purple",
+              "description": [
+                {
+                  "text": "LES DE XOCO:\n\nBase de galeta maria, alfàbega, ratlladura de llima, xocolate blanc belga, gerds i pistatxos (adaptable a la fruita de temporada)."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "XOCO AMB LLET:",
+              "color": "green",
+              "description": [
+                {
+                  "text": "LES DE XOCO:\nBase de galeta maria, praliné d’avellana i xocolate belga amb llet, decorada amb fruita de temporada."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "XOCO PUR:",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "LES DE XOCO:\nBase de galeta maria mullada amb "
+                },
+                {
+                  "text": "café d’especialitat",
+                  "bold": true
+                },
+                {
+                  "text": ", "
+                },
+                {
+                  "text": "xocolate 85%",
+                  "bold": true
+                },
+                {
+                  "text": ", fruita de temporada."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            },
+            {
+              "name": "PISTATXO:",
+              "color": "purple",
+              "description": [
+                {
+                  "text": "PREMIUM:\n\nBase de galeta maria i pistatxos, amb "
+                },
+                {
+                  "text": "crema de pistatxo casolana",
+                  "bold": true
+                },
+                {
+                  "text": ", decorada amb més pistatxo i fruita de temporada."
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 5000,
+                  "description": [
+                    {
+                      "text": "Decoració normal (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 5500,
+                  "description": [
+                    {
+                      "text": "Flors de boda (12/15 racions)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "question": [
+            {
+              "text": "Quantes tortades inclou el bufet?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Les que vulgueu, així de simple! Pagueu per les que contracteu a preus normals de carta 🙂"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Com es decoren?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Com veieu a la taula, teniu l’opció de que les decorem com de normal a l’obrador, amb fruita de temporada, o de decorar-les amb les flors de la vostra boda. Contacteu-nos i ho parlem!"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Es poden combinar les dues coses?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Clar que sí! Entenem que moltes parelles volen una tortada especial per a les fotos, però també és cert que, moltes vegades, aplegat el moment de servir el pastís, la gent ja té ganes de ballar i es tira molt de menjar. Amb aquesta opció, és un win win. Podeu agafar una tortada de dos o tres pisos (el que preferiu) i després fer una taula dolça combinant tortades i altres dolcets o simplement de pastissos de formatge per a tots els gustos i sabors!"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Adapteu per a intoleràncies, celiaquies...?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Sempre sí! Intentem que tothom puga gaudir del dia. Pregunta’ns i et donem opcions!"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Monteu vosaltres la taula amb el bufet?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Pel moment no tenim un transport adaptat al transport dels nostres productes, pel que caldria arreplegar-los a l’obrador. Sí podem posar-nos en contacte amb la sala per veure si podem buscar una solució i oferim el servei de muntatge tant de taula com de decoració dels pastissos in situ per un suplement. Pregunteu-nos i ho aclarim!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "taules-dolces",
+      "label": "Taules dolces",
+      "description": [
+        {
+          "text": "L’última opció que vos podem donar és la de la taula dolça completa, en la que podeu tenir tant tartes de distints sabors (que podeu triar de la taula de dalt), com micotetes (mini cookies de 30gr casolanes) de sabors variats embossades de manera individual perquè les vostres personetes preferides se les puguen endur o menjar fresques al moment."
+        }
+      ],
+      "tables": [
+        {
+          "title": "Micotetes",
+          "footnote": [
+            {
+              "text": "Preu sense IVA. No incloem transport. Els productes s’han d’arreplegar a l’obrador."
+            }
+          ],
+          "items": [
+            {
+              "name": "Micotetes",
+              "color": "mustard",
+              "description": [
+                {
+                  "text": "Sabors variats (xoco negre i sal, cacahuet fregit amb mel, 3 xocolates…)"
+                }
+              ],
+              "alert": [],
+              "prices": [
+                {
+                  "kind": "amount",
+                  "amount": 4500,
+                  "description": [
+                    {
+                      "text": "25 micotetes ("
+                    },
+                    {
+                      "text": "1,8€",
+                      "bold": true
+                    },
+                    {
+                      "text": " ud)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 8000,
+                  "description": [
+                    {
+                      "text": "50 micotetes ("
+                    },
+                    {
+                      "text": "1,6€",
+                      "bold": true
+                    },
+                    {
+                      "text": " ud)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 10500,
+                  "description": [
+                    {
+                      "text": "75 micotetes ("
+                    },
+                    {
+                      "text": "1,4€",
+                      "bold": true
+                    },
+                    {
+                      "text": "ud)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "amount",
+                  "amount": 12000,
+                  "description": [
+                    {
+                      "text": "100 micotetes "
+                    },
+                    {
+                      "text": "1,2€",
+                      "bold": true
+                    },
+                    {
+                      "text": " ud)"
+                    }
+                  ],
+                  "star": true,
+                  "bold": true,
+                  "italic": false
+                },
+                {
+                  "kind": "text",
+                  "text": "Contacta’ns i et fem preu!",
+                  "description": [
+                    {
+                      "text": "+100"
+                    }
+                  ],
+                  "star": false,
+                  "bold": false,
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "question": [
+            {
+              "text": "Es poden triar els sabors?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Els sabors es posen en funció de disponibilitat a l’obrador, ja que tenim un espai molt limitat, però sí atenem a preferències i adaptacions."
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Es poden combinar tartes i cookies?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Clar que sí! Podem fer una taula amb les tartes i cookies que vulgueu. Amb tota la informació al document, es podeu organitzar i decidir què vos va millor. Nosaltres estem sempre ahí per assessorar-vos. Hem fet bodes en les que hem posat una tarta nupcial de dos pisos al centre de la taula, vàries tartes de formatge i pots amb micotetes, i han sigut una sensació! :)"
+            }
+          ]
+        },
+        {
+          "question": [
+            {
+              "text": "Monteu vosaltres la taula dolça?"
+            }
+          ],
+          "answer": [
+            {
+              "text": "Pel moment no tenim un transport adaptat al transport dels nostres productes, pel que caldria arreplegar-los a l’obrador. Sí podem posar-nos en contacte amb la sala per veure si podem buscar una solució i oferim el servei de muntatge tant de taula com de decoració dels pastissos in situ per un suplement. Pregunteu-nos i ho aclarim!"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

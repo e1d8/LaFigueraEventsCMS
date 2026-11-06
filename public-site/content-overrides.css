@@ -1,0 +1,13 @@
+/* Content controls preserve the fixed visual system. */
+.product-option-value .amount{font-weight:400}
+.product-option-value .amount strong{font-weight:600}
+.product-note{white-space:normal;max-width:45%;overflow-wrap:anywhere}
+.product-note:empty{display:none}
+.product-detail{white-space:normal}
+.pickup-note{display:block}
+.pickup-note:before{display:inline-block;vertical-align:middle;margin-right:10px}
+em,i{font-style:italic;font-synthesis:style}
+.home-opening{white-space:normal}
+.load-error,.loading-message{margin:45px auto;max-width:650px;line-height:1.7}
+.load-error button{margin-top:20px;padding:10px 20px;background:var(--purple);border:1px solid var(--line);color:var(--ink);font:inherit;border-radius:4px;cursor:pointer}
+@media(max-width:767px){.product-heading{flex-wrap:wrap}.product-note{max-width:100%}}

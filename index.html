@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ca-valencia">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#e4e6fb">
+    <meta name="robots" content="noindex, nofollow">
+    <title>La figuera · Editar contingut</title>
+    <link rel="icon" href="./assets/favicon.png">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <a class="brand" href="./" aria-label="La figuera · Editor">
+        <img src="./assets/figa-256.png" width="48" height="48" alt="">
+        <span>La figuera<small>EVENTS</small></span>
+      </a>
+      <div class="save-area"><span id="save-state" role="status" aria-live="polite"></span><button id="save" class="primary" disabled>Guardar</button></div>
+    </header>
+    <div class="layout">
+      <nav id="navigation" aria-label="Contingut"></nav>
+      <main id="main" tabindex="-1"><p role="status">Carregant…</p></main>
+    </div>
+    <dialog id="password-dialog" aria-labelledby="password-title">
+      <form id="password-form">
+        <h2 id="password-title">Guardar els canvis</h2>
+        <label for="password">Contrasenya</label>
+        <input id="password" type="password" autocomplete="current-password" required maxlength="1024">
+        <p id="password-error" class="error" role="alert"></p>
+        <div class="actions"><button type="button" id="cancel-save">Cancel·lar</button><button type="submit" class="primary">Guardar</button></div>
+      </form>
+    </dialog>
+    <dialog id="link-dialog" aria-labelledby="link-title">
+      <form id="link-form">
+        <h2 id="link-title">Enllaç</h2>
+        <label for="link-url">Adreça</label><input id="link-url" type="text" placeholder="https://" required>
+        <p id="link-error" class="error" role="alert"></p>
+        <div class="actions"><button type="button" id="cancel-link">Cancel·lar</button><button type="submit" class="primary">Aplicar</button></div>
+      </form>
+    </dialog>
+    <noscript><p>Activa JavaScript per editar el contingut.</p></noscript>
+  </body>
+</html>
