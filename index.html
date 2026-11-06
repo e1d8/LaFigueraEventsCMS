@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#e4e6fb">
     <meta name="robots" content="noindex, nofollow">
-    <title>La figuera · Editar contingut</title>
-    <link rel="icon" href="./assets/favicon.png">
-    <link rel="stylesheet" href="./styles.css?v=20261106-3">
-    <script type="module" src="./app.js?v=20261106-3"></script>
+    <title>La Figuera Events · CMS</title>
+    <link rel="icon" href="./assets/favicon.png?v=6f3d12d5">
+    <link rel="stylesheet" href="./styles.css?v=20261106-4">
+    <script type="module" src="./app.js?v=20261106-4"></script>
   </head>
   <body>
     <header class="header">
       <a class="brand" href="./" aria-label="La figuera · Editor">
-        <img src="./assets/figa-256.png" width="48" height="48" alt="">
+        <img src="./assets/figa-256.png?v=d1f3d434" width="48" height="48" alt="">
         <span>La figuera<small>EVENTS CMS</small></span>
       </a>
       <div class="save-area"><span id="save-state" role="status" aria-live="polite"></span><button id="reset" type="button" title="Esborrar l’esborrany i carregar el contingut actual" disabled>Restablir</button><button id="save" class="primary" disabled>Guardar</button></div>
@@ -38,6 +38,14 @@
         <p id="link-error" class="error" role="alert"></p>
         <div class="actions"><button type="button" id="cancel-link">Cancel·lar</button><button type="submit" class="primary">Aplicar</button></div>
       </form>
+    </dialog>
+    <dialog id="result-dialog" aria-labelledby="result-title" aria-describedby="result-message">
+      <h2 id="result-title">Resultat del guardat</h2>
+      <div id="result-body" tabindex="0" aria-label="Mantín polsat per veure el pes enviat">
+        <p id="result-message"></p>
+        <p id="result-size" aria-live="polite" hidden></p>
+      </div>
+      <div class="actions"><button type="button" id="close-result" class="primary">Tancar</button></div>
     </dialog>
     <noscript><p>Activa JavaScript per editar el contingut.</p></noscript>
   </body>

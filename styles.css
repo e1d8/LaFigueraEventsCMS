@@ -11,6 +11,24 @@
 .price-type-toggle button{border:0;padding:5px 10px;font-size:13px;color:var(--muted);white-space:nowrap}
 .price-type-toggle button[aria-pressed=true]{background:var(--purple);color:var(--ink);font-weight:600}
 .price-value-field{margin-bottom:18px}
+.price-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:18px}
+.price-heading h3{flex-shrink:0}
+.price-heading>.card-tools{margin:0;gap:4px}
+.price-heading>.card-tools button{width:26px;min-height:28px;padding:3px 4px;font-size:14px}
+.price-heading>.card-tools .delete{margin-left:0;font-size:20px}
+.inline-title-field{display:block;min-width:0;flex:1;margin:0;font-weight:600}
+.inline-title-field input:not([type=checkbox]):not([type=radio]){display:block;min-height:32px;padding:3px 5px;background:transparent;border-color:transparent;font-weight:600}
+.inline-title-field input:focus{background:var(--white);border-color:var(--line)}
+.inline-title-field .editor-wrap{display:block;overflow:visible;border-color:transparent;background:transparent}
+.inline-title-field .rich-editor{display:block;min-height:26px;padding:2px 5px;font-size:inherit;font-weight:400}
+.inline-title-field .toolbar{display:none;flex-wrap:wrap}
+.inline-title-field:focus-within .toolbar{display:flex}
+.inline-title-field:focus-within .editor-wrap{background:var(--white);border-color:var(--line)}
+.inline-title-field .field-error{display:block;font-weight:400}
+.inline-title-field .field-error[hidden]{display:none}
+#result-body{min-height:90px;outline-offset:5px;user-select:none;touch-action:none;display:flex;align-items:center}
+#result-size{font-size:14px}
+[hidden]{display:none!important}
 .save-area{gap:12px;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:850px){.layout{grid-template-columns:170px minmax(0,1fr);gap:28px;padding-inline:4vw}.header{padding-inline:4vw}.card-body{padding:18px 14px}.colors{gap:8px}.card-row>.card-tools{flex-direction:column}.card-row{gap:8px}}
 @media(max-width:620px){.header{padding:14px 20px;min-height:83px;gap:12px}.brand{gap:9px}.brand img{width:35px;height:35px}.brand>span{font-size:25px}.brand small{font-size:8px;letter-spacing:4px}.save-area{gap:8px;flex-wrap:wrap;justify-content:flex-end}#save-state{font-size:11px;max-width:160px}.primary{padding:9px 16px}.layout{display:block;padding:18px 20px 60px}nav{position:static;display:flex;gap:6px;overflow-x:auto;margin:0 -4px 28px;padding:4px 4px 10px}nav button{white-space:nowrap;font-size:13px;padding:8px 10px;flex-shrink:0}h1{margin-bottom:25px}.price-grid{grid-template-columns:110px minmax(0,1fr)}.card>summary{padding:14px}.card-tools{gap:4px}.card-tools button{font-size:12px;padding:5px 8px}.color-option span{padding-inline:5px}}

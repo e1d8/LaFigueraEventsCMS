@@ -120,11 +120,13 @@ Guarda el fitxer. En GitHub Desktop, fes commit i push dels canvis del CMS. Espe
 - Selecciona una secció i edita els camps. Els grups de taules, ítems i preguntes es poden desplegar.
 - Els botons **↑ / ↓** canvien l’ordre dins del grup. En taules, ítems i preguntes estan a la dreta, fora del desplegable. **×** elimina l’element després de demanar confirmació.
 - En un text, selecciona les paraules i polsa **B**, **I** o **Enllaç**. Per separar línies, polsa Intro. El text apegat entra sense format extern.
-- El commutador de cada preu permet triar **Import (€)** o **Text curt**. Els imports només accepten dígits i un separador decimal, coma o punt; una entrada no vàlida queda a zero. El símbol € s’afegix automàticament. En **Text curt** pots escriure lliurement. Cada preu té la seua descripció i el seu asterisc.
+- Els títols de les taules, els noms dels ítems i les preguntes s’editen directament en la capçalera, també quan estan plegats. Polsa el signe **+ / −** per desplegar o plegar el contingut. Les preguntes mantenen les opcions de format.
+- El commutador de cada preu permet triar **Import (€)** o **Text curt**. Els imports només accepten dígits i un separador decimal, coma o punt; una entrada no vàlida queda a zero. Si intentes superar els dos decimals, es conserva el número anterior. El símbol € s’afegix automàticament. En **Text curt** pots escriure lliurement. Cada preu té la seua descripció i el seu asterisc.
 - Si hi ha un asterisc, ompli la nota de la taula. Sense asteriscs, la nota no es mostra.
-- Les modificacions es conserven localment en eixe navegador fins a guardar. La contrasenya només s’utilitza per a l’enviament i es buida després.
+- Les modificacions només es mantenen en la pestanya oberta: no es guarden esborranys entre sessions. Recarregar la pàgina descarta els canvis sense guardar i carrega el contingut actual del repositori. Els esborranys de versions anteriors s’eliminen automàticament. La contrasenya només s’utilitza per a l’enviament i es buida després.
 - **Restablir** descarta l’esborrany local després de confirmar i torna a carregar el contingut actual de GitHub. Si falla la connexió, conserva l’esborrany perquè no perdes el treball. No modifica la web ni demana contrasenya.
 - Si una altra persona ha guardat abans, el CMS bloqueja el guardat. Descarrega l’esborrany, carrega la versió actual i torna a aplicar els canvis necessaris. La descàrrega és una còpia de consulta, no una importació automàtica.
+- Després de cada intent de guardat, una finestra mostra la confirmació o l’error i es tanca manualment amb **Tancar**. Mantín polsat dins de la finestra per veure **«x KiB enviats de màxim 512 KiB»**. És el pes real en UTF-8 del cos JSON enviat, inclòs el SHA; no inclou les capçaleres ni la contrasenya. En deixar de polsar, torna a mostrar-se el missatge. També funciona mantenint la barra espaiadora amb el missatge enfocat.
 
 ## Manteniment
 
@@ -155,7 +157,7 @@ Comprova un guardat i revoca el token anterior en GitHub.
 3. Copia el contingut complet d’eixa versió.
 4. Torna a `content.json` en la branca `main`, polsa el llapis i substituïx el contingut pel que has copiat.
 5. Crea el commit. Pages publicarà eixa versió.
-6. Recarrega el CMS. Si hi havia un esborrany pendent, conserva’l i utilitza **Carregar versió actual** quan es detecte el conflicte.
+6. Recarrega el CMS per carregar el contingut restaurat. Els canvis locals sense guardar es descartaran.
 
 ### Problemes habituals
 

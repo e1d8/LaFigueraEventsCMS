@@ -1,4 +1,4 @@
-import { validateContent, COLORS, rich, textOf, parseAmount, safeLink, CONTACT_IDS } from './shared/content-model.js';
+import { validateContent, COLORS, parseAmount, safeLink, CONTACT_IDS, MAX_BODY_BYTES } from './shared/content-model.js';
 import { appendRich, readRich } from './shared/rich-text.js';
 
 // Always reload deployment configuration, even if an earlier URL is still in the browser cache.
@@ -14,11 +14,13 @@ const passwordForm = document.querySelector('#password-form');
 const passwordInput = document.querySelector('#password');
 const passwordError = document.querySelector('#password-error');
 const linkDialog = document.querySelector('#link-dialog');
-const draftKey = `la-figuera-cms:v1:${WORKER_URL || 'local'}`;
+const resultDialog = document.querySelector('#result-dialog');
+const resultMessage = document.querySelector('#result-message');
+const resultSize = document.querySelector('#result-size');
 const contactLabels = { whatsapp: 'WhatsApp', email: 'Correu', instagram: 'Instagram' };
 let content, base, sha, latest;
 let currentSection = 'general', dirty = false, busy = false, conflicted = false;
-let localWarning = '', fieldSequence = 0, linkSelection;
+let fieldSequence = 0, linkSelection;
 let fields = new Map();
 const expandedCards = new WeakSet();
 const clone = value => structuredClone(value);
@@ -38,30 +40,29 @@ function updateSave() {
   resetButton.disabled = !content || busy;
 }
 
-function persistDraft() {
-  try {
-    if (dirty) localStorage.setItem(draftKey, JSON.stringify({ document: content, base, sha, section: currentSection }));
-    else localStorage.removeItem(draftKey);
-    localWarning = '';
-  } catch {
-    localWarning = 'No es pot conservar l’esborrany en este navegador. Mantín esta pestanya oberta fins a guardar.';
-    setStatus(localWarning);
-  }
-}
+// Remove drafts left by previous versions. New edits only live in memory.
+for (const storageName of ['localStorage', 'sessionStorage']) try {
+  const storage = window[storageName];
+  for (const key of Object.keys(storage)) if (key.startsWith('la-figuera-cms:v1:')) storage.removeItem(key);
+} catch { /* Storage is optional; no content is ever persisted. */ }
 function changed() {
   dirty = JSON.stringify(content) !== JSON.stringify(base);
-  persistDraft(); updateSave();
-  if (!localWarning) setStatus(dirty ? 'Canvis sense guardar' : 'Sense canvis');
+  updateSave(); setStatus(dirty ? 'Canvis sense guardar' : 'Sense canvis');
 }
 
-function field(label, path, control) {
-  const wrapper = el('div', 'field'); wrapper.dataset.path = path;
+function field(label, path, control, inline = false) {
+  const wrapper = el(inline ? 'span' : 'div', 'field'); wrapper.dataset.path = path;
   const id = `field-${++fieldSequence}`;
   const caption = el('label', '', label); caption.htmlFor = id;
   control.id = id;
-  const error = el('p', 'field-error'); error.id = `${id}-error`; error.hidden = true;
+  const error = el(inline ? 'span' : 'p', 'field-error'); error.id = `${id}-error`; error.hidden = true;
   control.setAttribute('aria-describedby', error.id);
   wrapper.append(caption, control, error);
+  if (inline) {
+    wrapper.classList.add('inline-title-field'); caption.classList.add('visually-hidden');
+    wrapper.addEventListener('click', event => event.stopPropagation());
+    wrapper.addEventListener('keydown', event => event.stopPropagation());
+  }
   fields.set(path, { wrapper, control, error });
   control.addEventListener('input', () => {
     wrapper.classList.remove('has-error'); error.hidden = true;
@@ -69,10 +70,11 @@ function field(label, path, control) {
   });
   return wrapper;
 }
-function textField(label, value, path, update, maxLength = 200) {
+function textField(label, value, path, update, maxLength = 200, inline = false) {
   const control = el('input'); control.type = 'text'; control.value = value; control.maxLength = maxLength;
+  if (inline) control.placeholder = 'Sense títol';
   control.addEventListener('input', () => { update(control.value); changed(); });
-  return field(label, path, control);
+  return field(label, path, control, inline);
 }
 function checkbox(label, checked, update) {
   const wrapper = el('label', 'check-label');
@@ -91,10 +93,11 @@ function openLink(editor) {
   document.querySelector('#link-error').textContent = '';
   linkDialog.showModal(); document.querySelector('#link-url').focus();
 }
-function richField(label, value, path, update) {
-  const shell = el('div', 'editor-wrap');
-  const toolbar = el('div', 'toolbar'); toolbar.setAttribute('role', 'group'); toolbar.setAttribute('aria-label', `Format de ${label.toLowerCase()}`);
-  const editor = el('div', 'rich-editor'); editor.contentEditable = 'true'; editor.setAttribute('role', 'textbox');
+function richField(label, value, path, update, inline = false) {
+  const tag = inline ? 'span' : 'div';
+  const shell = el(tag, 'editor-wrap');
+  const toolbar = el(tag, 'toolbar'); toolbar.setAttribute('role', 'group'); toolbar.setAttribute('aria-label', `Format de ${label.toLowerCase()}`);
+  const editor = el(tag, 'rich-editor'); editor.contentEditable = 'true'; editor.setAttribute('role', 'textbox');
   editor.setAttribute('aria-multiline', 'true'); editor.dataset.placeholder = 'Escriu ací…';
   appendRich(editor, value);
   const command = name => { editor.focus(); document.execCommand('styleWithCSS', false, false); document.execCommand(name); editor.dispatchEvent(new Event('input', { bubbles: true })); };
@@ -117,7 +120,7 @@ function richField(label, value, path, update) {
   });
   editor.addEventListener('input', () => { update(readRich(editor)); changed(); });
   shell.append(toolbar, editor);
-  const wrapper = field(label, path, shell);
+  const wrapper = field(label, path, shell, inline);
   const caption = wrapper.querySelector('label'); caption.htmlFor = `${shell.id}-editor`; editor.id = caption.htmlFor;
   editor.setAttribute('aria-labelledby', `${shell.id}-label`); caption.id = `${shell.id}-label`;
   editor.setAttribute('aria-describedby', `${shell.id}-error`);
@@ -139,7 +142,7 @@ document.querySelector('#cancel-link').addEventListener('click', () => linkDialo
 function renderNavigation() {
   navigation.replaceChildren();
   for (const [id, label] of [['general', 'General'], ['home', 'Inici'], ...content.categories.map(category => [category.id, category.label]), ['contact', content.contact.label]]) {
-    const control = button(label, () => { currentSection = id; render(); if (dirty) persistDraft(); });
+    const control = button(label, () => { currentSection = id; render(); });
     if (currentSection === id) control.setAttribute('aria-current', 'page');
     navigation.append(control);
   }
@@ -160,11 +163,11 @@ function moveControls(list, index, removeLabel, compact = false) {
   up.title = 'Pujar'; down.title = 'Baixar';
   tools.append(up, down, remove); return tools;
 }
-function card(title, list, index, kind, path) {
+function card(list, index, kind, path) {
   const row = el('div', 'card-row');
   const node = el('details', `card ${kind}-card`); node.dataset.cardPath = path;
   node.contentEntry = list[index]; node.open = expandedCards.has(node.contentEntry);
-  const summary = el('summary', '', title || 'Sense títol');
+  const summary = el('summary');
   const body = el('div', 'card-body');
   const controls = moveControls(list, index, kind === 'table' ? 'Vols eliminar esta taula i tots els seus ítems?' : 'Vols eliminar este element?', true);
   controls.dataset.controlsFor = path;
@@ -182,7 +185,8 @@ function renderPrices(item, path) {
   const container = el('div');
   item.prices.forEach((price, index) => {
     const pp = `${path}.${index}`, block = el('div', 'price'); block.dataset.pricePath = pp;
-    const heading = el('h3', '', `Preu ${index + 1}`); block.append(heading, moveControls(item.prices, index, 'Vols eliminar este preu?'));
+    const header = el('div', 'price-heading');
+    header.append(el('h3', '', `Preu ${index + 1}`), moveControls(item.prices, index, 'Vols eliminar este preu?', true)); block.append(header);
     const toggle = el('div', 'price-type-toggle');
     toggle.setAttribute('role', 'group'); toggle.setAttribute('aria-label', 'Tipus de preu');
     for (const [kind, label] of [['amount', 'Import (€)'], ['text', 'Text curt']]) {
@@ -201,14 +205,23 @@ function renderPrices(item, path) {
       const input = el('input'); input.type = 'text'; input.inputMode = 'decimal'; input.maxLength = 10;
       input.value = display ?? '0';
       const validInput = value => /^\d{0,7}(?:[.,]\d{0,2})?$/.test(value);
+      let acceptedValue = validInput(input.value) ? input.value : '0';
+      input.value = acceptedValue;
+      input.addEventListener('beforeinput', event => {
+        if (event.isComposing || event.inputType !== 'insertText' || event.data === null) return;
+        const candidate = input.value.slice(0, input.selectionStart) + event.data + input.value.slice(input.selectionEnd);
+        if (/^\d*(?:[.,]\d{3,})$/.test(candidate)) event.preventDefault();
+      });
       input.addEventListener('input', () => {
+        if (/^\d*(?:[.,]\d{3,})$/.test(input.value)) { input.value = acceptedValue; return; }
         if (!validInput(input.value)) input.value = '0';
+        acceptedValue = input.value;
         let number = input.value.replace(/[.,]$/, '');
         if (/^[.,]/.test(number)) number = `0${number}`;
         price.amount = parseAmount(number) ?? 0;
         changed();
       });
-      input.addEventListener('blur', () => { input.value = String(price.amount / 100).replace('.', ','); });
+      input.addEventListener('blur', () => { input.value = String(price.amount / 100).replace('.', ','); acceptedValue = input.value; });
       valueField = field('Import (€)', `${pp}.amount`, input);
     } else valueField = textField('Text curt', price.text, `${pp}.text`, value => { price.text = value; }, 80);
     valueField.querySelector('label').classList.add('visually-hidden');
@@ -233,14 +246,14 @@ function renderTables(category, ci) {
   const container = el('div', 'collection');
   category.tables.forEach((table, ti) => {
     const tp = `categories.${ci}.tables.${ti}`;
-    const { row, body, summary } = card(table.title, category.tables, ti, 'table', tp);
-    body.append(textField('Títol de la taula', table.title, `${tp}.title`, value => { table.title = value; summary.lastChild.textContent = value || 'Sense títol'; }));
+    const { row, body, summary } = card(category.tables, ti, 'table', tp);
+    summary.append(textField('Títol de la taula', table.title, `${tp}.title`, value => { table.title = value; }, 200, true));
     const items = el('div', 'collection');
     table.items.forEach((item, ii) => {
       const ip = `${tp}.items.${ii}`;
-      const entry = card(item.name, table.items, ii, 'item', ip);
+      const entry = card(table.items, ii, 'item', ip);
       const swatch = el('span', 'swatch'); swatch.style.background = COLORS[item.color]; entry.summary.prepend(swatch);
-      entry.body.append(textField('Nom de l’ítem', item.name, `${ip}.name`, value => { item.name = value; entry.summary.lastChild.textContent = value || 'Sense títol'; }));
+      entry.summary.append(textField('Nom de l’ítem', item.name, `${ip}.name`, value => { item.name = value; }, 200, true));
       const colorField = el('div', 'field'); colorField.append(el('span', 'field-label', 'Color del subratllat'));
       const colors = el('div', 'colors'); colors.setAttribute('role', 'group'); colors.setAttribute('aria-label', 'Color del subratllat');
       for (const [color, name] of [['mustard', 'Mostassa'], ['purple', 'Lila'], ['green', 'Verd']]) {
@@ -266,8 +279,9 @@ function renderQuestions(category, ci) {
   const container = el('div', 'collection');
   category.questions.forEach((question, qi) => {
     const qp = `categories.${ci}.questions.${qi}`;
-    const { row, body, summary } = card(textOf(question.question), category.questions, qi, 'question', qp);
-    body.append(richField('Pregunta', question.question, `${qp}.question`, value => { question.question = value; summary.lastChild.textContent = textOf(value) || 'Sense títol'; }), richField('Resposta', question.answer, `${qp}.answer`, value => { question.answer = value; }));
+    const { row, body, summary } = card(category.questions, qi, 'question', qp);
+    summary.append(richField('Pregunta', question.question, `${qp}.question`, value => { question.question = value; }, true));
+    body.append(richField('Resposta', question.answer, `${qp}.answer`, value => { question.answer = value; }));
     const pending = pendingControl(question); if (pending) body.prepend(pending);
     container.append(row);
   });
@@ -287,14 +301,13 @@ async function reloadCurrent() {
   try {
     const result = await requestContent();
     latest = result; content = clone(result.document); base = clone(result.document); sha = result.sha;
-    conflicted = false; dirty = false; persistDraft(); render(); setStatus('Versió actual carregada');
+    conflicted = false; dirty = false; render(); setStatus('Versió actual carregada');
   } catch (error) { setStatus(error.message); }
   finally { busy = false; document.querySelector('.layout').inert = false; updateSave(); }
 }
 resetButton.addEventListener('click', reloadCurrent);
 function notices() {
   if (!WORKER_URL) { const notice = el('div', 'notice'); notice.append(el('p', '', 'El guardat encara no està disponible. Pots provar l’edició.')); main.append(notice); }
-  if (localWarning) main.append(el('p', 'notice', localWarning));
   if (conflicted) {
     const notice = el('div', 'notice'); notice.setAttribute('role', 'alert');
     notice.append(el('p', '', 'Hi ha una versió més recent. Conserva l’esborrany abans de carregar-la.'));
@@ -310,8 +323,8 @@ function render() {
   main.replaceChildren(); fields = new Map(); renderNavigation(); notices();
   if (currentSection === 'general') {
     main.append(el('h1', '', 'General'), el('h2', '', 'Categories'));
-    content.categories.forEach((category, ci) => main.append(textField('Nom de la categoria', category.label, `categories.${ci}.label`, value => { category.label = value; renderNavigation(); })));
-    main.append(textField('Nom de contacte', content.contact.label, 'contact.label', value => { content.contact.label = value; renderNavigation(); }), el('h2', '', 'Contactes'));
+    content.categories.forEach((category, ci) => main.append(textField(`${ci + 1}a`, category.label, `categories.${ci}.label`, value => { category.label = value; renderNavigation(); })));
+    main.append(textField('4a', content.contact.label, 'contact.label', value => { content.contact.label = value; renderNavigation(); }), el('h2', '', 'Contactes'));
     for (const id of CONTACT_IDS) {
       const contact = content.contacts[id], group = el('section', 'contact-group');
       group.append(el('h3', '', contactLabels[id]), textField('Text visible', contact.text, `contacts.${id}.text`, value => { contact.text = value; }), textField('Enllaç', contact.href, `contacts.${id}.href`, value => { contact.href = value; }, 2048)); main.append(group);
@@ -383,24 +396,34 @@ async function load() {
   try {
     latest = await requestContent();
     content = clone(latest.document); base = clone(latest.document); sha = latest.sha;
-    try {
-      const draft = JSON.parse(localStorage.getItem(draftKey) || 'null');
-      if (draft && draft.document?.schemaVersion === 1 && !validateContent(draft.base).length) {
-        // Rendering is defensive below; malformed local storage never affects GitHub.
-        content = draft.document; base = draft.base; sha = draft.sha;
-        currentSection = draft.section || 'general'; dirty = JSON.stringify(content) !== JSON.stringify(base);
-        conflicted = dirty && sha !== latest.sha;
-      }
-    } catch { localWarning = 'No s’ha pogut recuperar l’esborrany local.'; }
-    try { render(); } catch {
-      content = clone(latest.document); base = clone(latest.document); sha = latest.sha; currentSection = 'general'; dirty = false; conflicted = false;
-      localWarning = 'L’esborrany local no és compatible. S’ha carregat el contingut actual.'; render();
-    }
-    setStatus(dirty ? 'Esborrany recuperat' : 'Sense canvis');
+    currentSection = 'general'; dirty = false; conflicted = false;
+    render(); setStatus('Sense canvis');
   } catch (error) {
     main.replaceChildren(el('h1', '', 'Contingut'), el('p', 'error', error.message), button('Reintentar', load));
   }
 }
+
+function showResult(success, message, bodyBytes) {
+  document.querySelector('#result-title').textContent = success ? 'Canvis guardats' : 'No s’ha pogut guardar';
+  resultMessage.textContent = message; resultMessage.classList.toggle('error', !success);
+  const kib = new Intl.NumberFormat('ca-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(bodyBytes / 1024);
+  resultSize.textContent = `${kib} KiB enviats de màxim ${MAX_BODY_BYTES / 1024} KiB`;
+  resultMessage.hidden = false; resultSize.hidden = true;
+  resultDialog.showModal(); document.querySelector('#result-body').focus();
+}
+function revealSize(reveal) { resultMessage.hidden = reveal; resultSize.hidden = !reveal; }
+resultDialog.addEventListener('pointerdown', event => {
+  if (event.target.closest('button') || event.button !== 0) return;
+  event.preventDefault(); resultDialog.setPointerCapture(event.pointerId); revealSize(true);
+});
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) resultDialog.addEventListener(type, () => revealSize(false));
+document.querySelector('#result-body').addEventListener('keydown', event => {
+  if (event.key === ' ') { event.preventDefault(); revealSize(true); }
+});
+document.querySelector('#result-body').addEventListener('keyup', event => { if (event.key === ' ') revealSize(false); });
+document.querySelector('#result-body').addEventListener('blur', () => revealSize(false));
+resultDialog.addEventListener('close', () => revealSize(false));
+document.querySelector('#close-result').addEventListener('click', () => resultDialog.close());
 
 saveButton.addEventListener('click', () => {
   const errors = validateContent(content);
@@ -416,11 +439,14 @@ passwordForm.addEventListener('submit', async event => {
   document.querySelector('.layout').inert = true;
   const controls = [...passwordForm.querySelectorAll('button, input')]; controls.forEach(control => { control.disabled = true; });
   setStatus('Guardant…');
+  const body = JSON.stringify({ document: content, sha });
+  const bodyBytes = new TextEncoder().encode(body).byteLength;
+  let outcome;
   try {
     const password = btoa(Array.from(new TextEncoder().encode(passwordInput.value), byte => String.fromCharCode(byte)).join('')); passwordInput.value = '';
     const response = await fetch(contentEndpoint(), {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${password}` },
-      body: JSON.stringify({ document: content, sha }), signal: AbortSignal.timeout(40000),
+      body, signal: AbortSignal.timeout(40000),
     });
     const result = await readResponse(response);
     if (!response.ok) {
@@ -430,19 +456,16 @@ passwordForm.addEventListener('submit', async event => {
     }
     if (typeof result.sha !== 'string' || (!result.commit && !result.unchanged)) throw new Error('No s’ha pogut confirmar el guardat. Torna-ho a provar.');
     sha = result.sha; base = clone(content); latest = { document: clone(content), sha }; dirty = false; conflicted = false;
-    persistDraft(); passwordDialog.close();
     status.dataset.commit = result.commit || '';
-    setStatus(result.unchanged ? 'El contingut ja està guardat.' : 'Canvis guardats. Es publicaran en breu.');
+    const message = result.unchanged ? 'El contingut ja està guardat.' : 'Canvis guardats. Es publicaran en breu.';
+    setStatus(message); outcome = { success: true, message };
   } catch (error) {
-    const message = error.name === 'TimeoutError' || error.name === 'TypeError' ? 'No s’ha pogut confirmar el guardat. Conservem l’esborrany; torna-ho a provar.' : error.message;
-    passwordError.textContent = message; setStatus(message);
+    const message = error.name === 'TimeoutError' || error.name === 'TypeError' ? 'No s’ha pogut confirmar el guardat. Els canvis es mantenen en esta pestanya; torna-ho a provar.' : error.message;
+    setStatus(message); outcome = { success: false, message };
   } finally {
     busy = false; document.querySelector('.layout').inert = false; controls.forEach(control => { control.disabled = false; }); passwordInput.value = ''; updateSave();
-    if (passwordDialog.open) passwordInput.focus();
+    passwordDialog.close();
+    if (outcome) showResult(outcome.success, outcome.message, bodyBytes);
   }
-});
-window.addEventListener('beforeunload', event => { if (dirty || busy) { event.preventDefault(); event.returnValue = ''; } });
-window.addEventListener('storage', event => {
-  if (event.key === draftKey && dirty) { localWarning = 'Hi ha una altra pestanya editant el contingut. Conserva els canvis abans de continuar.'; setStatus(localWarning); }
 });
 load();
