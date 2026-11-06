@@ -22,7 +22,8 @@
 .price-value-options{display:flex;align-items:stretch;gap:7px;margin-bottom:9px;max-width:100%}
 .price-value-options>.price-type-toggle{flex:0 1 auto;flex-wrap:nowrap;min-width:0;margin-bottom:0}
 .price-value-options .price-type-toggle button{min-width:0;white-space:normal;padding-inline:6px}
-.asterisk-toggle{flex:0 0 32px;padding:0;font-size:25px;line-height:1;min-height:38px;color:var(--muted)}
+.asterisk-toggle{display:grid;place-items:center;align-self:center;flex:0 0 38px;width:38px;height:38px;aspect-ratio:1;padding:0;min-height:38px;color:var(--muted)}
+.asterisk-toggle svg{display:block;width:18px;height:18px}
 .asterisk-toggle[aria-pressed=true]{background:var(--purple);border-color:var(--purple);color:var(--ink)}
 .price-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:18px}
 .price-heading h3{flex-shrink:0}

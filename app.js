@@ -257,9 +257,16 @@ function renderPrices(item, path) {
     }
     const valueOptions = el('div', 'price-value-options'); valueOptions.append(toggle);
     if (price.kind === 'amount') {
-      const star = button('*', () => {
+      const star = button('', () => {
         price.star = !price.star; star.setAttribute('aria-pressed', String(price.star)); changed(); refreshFootnoteHint();
       }, 'asterisk-toggle');
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('aria-hidden', 'true'); icon.setAttribute('focusable', 'false');
+      const strokes = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      strokes.setAttribute('d', 'M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9');
+      strokes.setAttribute('fill', 'none'); strokes.setAttribute('stroke', 'currentColor');
+      strokes.setAttribute('stroke-width', '2'); strokes.setAttribute('stroke-linecap', 'round');
+      icon.append(strokes); star.append(icon);
       star.setAttribute('aria-label', 'Asterisc'); star.title = 'Asterisc'; star.setAttribute('aria-pressed', String(price.star));
       valueOptions.append(star);
     }
