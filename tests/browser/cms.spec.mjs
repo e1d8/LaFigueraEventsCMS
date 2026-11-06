@@ -133,9 +133,14 @@ test('Preus, colors, nous elements i notes obligatòries', async ({ page }) => {
   const table = page.locator('[data-card-path="categories.0.tables.0"]');
   await table.locator(':scope > summary').press('Enter');
   const item = page.locator('[data-card-path="categories.0.tables.0.items.0"]');
+  await item.getByRole('button', { name: 'Color del subratllat: Mostassa', exact: true }).click();
+  await expect(item).not.toHaveAttribute('open', '');
+  const palette = item.getByRole('group', { name: 'Color del subratllat', exact: true });
+  await expect(palette.getByRole('button')).toHaveCount(3);
+  await palette.getByRole('button', { name: 'Verd', exact: true }).click();
+  await expect(item.getByRole('button', { name: 'Color del subratllat: Verd', exact: true })).toHaveAttribute('aria-expanded', 'false');
+  await expect(item).not.toHaveAttribute('open', '');
   await item.locator(':scope > summary').press('Enter');
-  await expect(item.getByRole('radio')).toHaveCount(3);
-  await item.getByRole('radio', { name: 'Verd', exact: true }).check();
   await item.getByRole('textbox', { name: 'Import (€)', exact: true }).first().fill('12,50');
   await table.getByRole('textbox', { name: 'Nota dels asteriscos' }).fill('');
   await page.locator('#save').click();
@@ -237,10 +242,10 @@ test('Els controls externs funcionen sense desplegar taules, ítems ni preguntes
   await expect(page.locator('[data-card-path="categories.0.tables.0.items.1"]')).not.toHaveAttribute('open', '');
   const questionControls = page.locator('[data-controls-for="categories.0.questions.0"]');
   await questionControls.getByRole('button', { name: 'Baixar', exact: true }).click();
-  await expect(page.locator('[data-card-path="categories.0.questions.1"] > summary').getByRole('textbox', { name: 'Pregunta', exact: true })).toHaveText('Què inclou el preu?');
+  await expect(page.locator('[data-card-path="categories.0.questions.1"] > summary').getByRole('textbox', { name: 'Pregunta', exact: true })).toHaveValue('Què inclou el preu?');
   page.once('dialog', dialog => dialog.accept());
   await page.locator('[data-controls-for="categories.0.questions.1"]').getByRole('button', { name: 'Eliminar', exact: true }).click();
-  await expect(page.locator('.question-card > summary').filter({ hasText: 'Què inclou el preu?' })).toHaveCount(0);
+  expect(await page.locator('.question-card > summary input').evaluateAll(inputs => inputs.map(input => input.value))).not.toContain('Què inclou el preu?');
 });
 
 test('El commutador de preus limita els imports i permet text lliure', async ({ page }) => {
@@ -251,6 +256,9 @@ test('El commutador de preus limita els imports i permet text lliure', async ({ 
   await expect(first.getByRole('button', { name: 'Import (€)', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(first.getByRole('button', { name: 'Text curt', exact: true })).toHaveAttribute('aria-pressed', 'false');
   const amount = first.getByRole('textbox', { name: 'Import (€)', exact: true });
+  const description = first.getByRole('textbox', { name: 'Descripció (opcional)', exact: true });
+  await expect(description).toBeVisible();
+  expect((await description.boundingBox()).y).toBeLessThan((await amount.boundingBox()).y);
   await amount.fill('12,30'); await expect(amount).toHaveValue('12,30');
   await amount.press('End'); await amount.pressSequentially('456'); await expect(amount).toHaveValue('12,30');
   await amount.fill('12,345'); await expect(amount).toHaveValue('12,30');
@@ -280,14 +288,16 @@ test('Categories numerades i edició directa de capçaleres sense desplegar-les'
   const question = page.locator('[data-card-path="categories.0.questions.0"]');
   const editor = question.getByRole('textbox', { name: 'Pregunta', exact: true });
   await editor.fill('Pregunta editada directament?');
-  await editor.press('ControlOrMeta+A');
-  await question.getByRole('button', { name: 'Negreta', exact: true }).first().click();
+  await expect(question.locator(':scope > summary .toolbar')).toHaveCount(0);
   await expect(question).not.toHaveAttribute('open', '');
+  await question.locator(':scope > summary').press('Enter');
+  await expect(question.getByRole('button', { name: 'Negreta', exact: true })).toBeVisible();
+  await question.locator(':scope > summary').press('Enter');
   await acceptSave(page); await expect(page.locator('#result-message')).toContainText('Canvis guardats');
   const category = calls[0].body.document.categories[0];
   expect(category.tables[0].title).toBe('Taula editada directament');
   expect(category.tables[0].items[0].name).toBe('Ítem editat directament');
-  expect(category.questions[0].question).toEqual([{ text: 'Pregunta editada directament?', bold: true }]);
+  expect(category.questions[0].question).toEqual([{ text: 'Pregunta editada directament?' }]);
 });
 
 test('La finestra de resultat es tanca manualment i mostra els KiB exactes mentre es manté polsada', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { validateContent, COLORS, parseAmount, safeLink, CONTACT_IDS, MAX_BODY_BYTES } from './shared/content-model.js';
+import { validateContent, COLORS, rich, textOf, parseAmount, safeLink, CONTACT_IDS, MAX_BODY_BYTES } from './shared/content-model.js';
 import { appendRich, readRich } from './shared/rich-text.js';
 
 // Always reload deployment configuration, even if an earlier URL is still in the browser cache.
@@ -22,6 +22,7 @@ let content, base, sha, latest;
 let currentSection = 'general', dirty = false, busy = false, conflicted = false;
 let fieldSequence = 0, linkSelection;
 let fields = new Map();
+let activeColorPicker;
 const expandedCards = new WeakSet();
 const clone = value => structuredClone(value);
 const el = (tag, className = '', text) => {
@@ -82,6 +83,64 @@ function checkbox(label, checked, update) {
   control.addEventListener('change', () => { update(control.checked); changed(); });
   wrapper.append(control, document.createTextNode(label)); return wrapper;
 }
+function closeColorPicker() {
+  if (!activeColorPicker) return;
+  activeColorPicker.options.hidden = true;
+  activeColorPicker.trigger.setAttribute('aria-expanded', 'false');
+  activeColorPicker = undefined;
+}
+function colorPicker(item) {
+  const selector = el('span', 'color-selector');
+  const trigger = button('', () => {
+    const wasOpen = activeColorPicker?.selector === selector;
+    closeColorPicker();
+    if (!wasOpen) {
+      options.hidden = false; trigger.setAttribute('aria-expanded', 'true');
+      activeColorPicker = { selector, trigger, options };
+      options.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    }
+  }, 'swatch-button');
+  const swatch = el('span', 'swatch'); swatch.setAttribute('aria-hidden', 'true'); trigger.append(swatch);
+  trigger.setAttribute('aria-expanded', 'false');
+  const options = el('span', 'color-options'); options.hidden = true;
+  options.id = `color-options-${++fieldSequence}`; trigger.setAttribute('aria-controls', options.id);
+  options.setAttribute('role', 'group'); options.setAttribute('aria-label', 'Color del subratllat');
+  const labels = { mustard: 'Mostassa', purple: 'Lila', green: 'Verd' };
+  const update = () => {
+    swatch.style.background = COLORS[item.color];
+    trigger.setAttribute('aria-label', `Color del subratllat: ${labels[item.color]}`);
+    trigger.title = `Color del subratllat: ${labels[item.color]}`;
+    for (const option of options.children) {
+      const selected = option.dataset.color === item.color;
+      option.setAttribute('aria-pressed', String(selected)); option.textContent = selected ? '✓' : '';
+    }
+  };
+  for (const [color, label] of Object.entries(labels)) {
+    const option = button('', () => {
+      item.color = color; update(); changed(); closeColorPicker(); trigger.focus();
+    }, 'color-choice');
+    option.dataset.color = color; option.style.background = COLORS[color];
+    option.setAttribute('aria-label', label); option.title = label; options.append(option);
+  }
+  selector.addEventListener('click', event => event.stopPropagation());
+  selector.addEventListener('keydown', event => {
+    event.stopPropagation();
+    if (event.key === 'Escape') { event.preventDefault(); closeColorPicker(); trigger.focus(); }
+    if (!options.hidden && ['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+      event.preventDefault();
+      const choices = [...options.children], current = choices.indexOf(document.activeElement);
+      const step = ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1;
+      choices[(current + step + choices.length) % choices.length].focus();
+    }
+  });
+  update(); selector.append(trigger, options); return selector;
+}
+function dismissColorPicker(event) {
+  if (activeColorPicker && !activeColorPicker.selector.contains(event.target)) closeColorPicker();
+}
+document.addEventListener('pointerdown', dismissColorPicker);
+document.addEventListener('focusin', dismissColorPicker);
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeColorPicker(); });
 function openLink(editor) {
   const selection = window.getSelection();
   if (!selection.rangeCount || selection.isCollapsed || !editor.contains(selection.getRangeAt(0).commonAncestorContainer)) {
@@ -186,7 +245,8 @@ function renderPrices(item, path) {
   item.prices.forEach((price, index) => {
     const pp = `${path}.${index}`, block = el('div', 'price'); block.dataset.pricePath = pp;
     const header = el('div', 'price-heading');
-    header.append(el('h3', '', `Preu ${index + 1}`), moveControls(item.prices, index, 'Vols eliminar este preu?', true)); block.append(header);
+    header.append(el('h3', '', `Preu ${index + 1}`), moveControls(item.prices, index, 'Vols eliminar este preu?', true));
+    block.append(header, richField('Descripció (opcional)', price.description, `${pp}.description`, value => { price.description = value; }));
     const toggle = el('div', 'price-type-toggle');
     toggle.setAttribute('role', 'group'); toggle.setAttribute('aria-label', 'Tipus de preu');
     for (const [kind, label] of [['amount', 'Import (€)'], ['text', 'Text curt']]) {
@@ -228,7 +288,7 @@ function renderPrices(item, path) {
     valueField.classList.add('price-value-field'); valueField.prepend(toggle); block.append(valueField);
     const controls = el('div', 'price-controls');
     controls.append(checkbox('Asterisc', price.star, value => { price.star = value; refreshFootnoteHint(); }), checkbox('Negreta', price.bold, value => { price.bold = value; }), checkbox('Cursiva', price.italic, value => { price.italic = value; }));
-    block.append(controls, richField('Descripció del preu (opcional)', price.description, `${pp}.description`, value => { price.description = value; }));
+    block.append(controls);
     const pending = pendingControl(price); if (pending) block.append(pending);
     container.append(block);
   });
@@ -252,17 +312,9 @@ function renderTables(category, ci) {
     table.items.forEach((item, ii) => {
       const ip = `${tp}.items.${ii}`;
       const entry = card(table.items, ii, 'item', ip);
-      const swatch = el('span', 'swatch'); swatch.style.background = COLORS[item.color]; entry.summary.prepend(swatch);
+      entry.summary.prepend(colorPicker(item));
       entry.summary.append(textField('Nom de l’ítem', item.name, `${ip}.name`, value => { item.name = value; }, 200, true));
-      const colorField = el('div', 'field'); colorField.append(el('span', 'field-label', 'Color del subratllat'));
-      const colors = el('div', 'colors'); colors.setAttribute('role', 'group'); colors.setAttribute('aria-label', 'Color del subratllat');
-      for (const [color, name] of [['mustard', 'Mostassa'], ['purple', 'Lila'], ['green', 'Verd']]) {
-        const label = el('label', 'color-option'), input = el('input'); input.type = 'radio'; input.name = `${ip}.color`; input.value = color; input.checked = color === item.color;
-        input.addEventListener('change', () => { item.color = color; swatch.style.background = COLORS[color]; changed(); });
-        const sample = el('span', '', name); sample.style.background = COLORS[color]; label.append(input, sample); colors.append(label);
-      }
-      colorField.append(colors);
-      entry.body.append(colorField, richField('Descripció (opcional)', item.description, `${ip}.description`, value => { item.description = value; }), richField('Alerta (opcional)', item.alert, `${ip}.alert`, value => { item.alert = value; }), renderPrices(item, `${ip}.prices`));
+      entry.body.append(richField('Descripció (opcional)', item.description, `${ip}.description`, value => { item.description = value; }), richField('Alerta (opcional)', item.alert, `${ip}.alert`, value => { item.alert = value; }), renderPrices(item, `${ip}.prices`));
       const pending = pendingControl(item); if (pending) entry.body.prepend(pending);
       items.append(entry.row);
     });
@@ -280,7 +332,7 @@ function renderQuestions(category, ci) {
   category.questions.forEach((question, qi) => {
     const qp = `categories.${ci}.questions.${qi}`;
     const { row, body, summary } = card(category.questions, qi, 'question', qp);
-    summary.append(richField('Pregunta', question.question, `${qp}.question`, value => { question.question = value; }, true));
+    summary.append(textField('Pregunta', textOf(question.question), `${qp}.question`, value => { question.question = rich(value); }, 20000, true));
     body.append(richField('Resposta', question.answer, `${qp}.answer`, value => { question.answer = value; }));
     const pending = pendingControl(question); if (pending) body.prepend(pending);
     container.append(row);
@@ -316,6 +368,7 @@ function notices() {
   }
 }
 function render() {
+  closeColorPicker();
   // Preserve expanded groups when a local action changes their contents.
   for (const node of main.querySelectorAll('details')) {
     if (node.open) expandedCards.add(node.contentEntry); else expandedCards.delete(node.contentEntry);
