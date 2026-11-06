@@ -7,6 +7,7 @@ const { WORKER_URL } = await import(`./config.js?v=${Date.now()}`);
 const main = document.querySelector('#main');
 const navigation = document.querySelector('#navigation');
 const saveButton = document.querySelector('#save');
+const resetButton = document.querySelector('#reset');
 const status = document.querySelector('#save-state');
 const passwordDialog = document.querySelector('#password-dialog');
 const passwordForm = document.querySelector('#password-form');
@@ -32,7 +33,10 @@ function button(text, action, className = '') {
   control.addEventListener('click', action); return control;
 }
 function setStatus(message) { status.textContent = message; }
-function updateSave() { saveButton.disabled = !content || !dirty || busy || conflicted || !WORKER_URL; }
+function updateSave() {
+  saveButton.disabled = !content || !dirty || busy || conflicted || !WORKER_URL;
+  resetButton.disabled = !content || busy;
+}
 
 function persistDraft() {
   try {
@@ -140,7 +144,7 @@ function renderNavigation() {
     navigation.append(control);
   }
 }
-function moveControls(list, index, removeLabel) {
+function moveControls(list, index, removeLabel, compact = false) {
   const tools = el('div', 'card-tools');
   const move = delta => {
     [list[index], list[index + delta]] = [list[index + delta], list[index]];
@@ -148,20 +152,25 @@ function moveControls(list, index, removeLabel) {
   };
   const up = button('↑', () => move(-1)); up.disabled = index === 0; up.setAttribute('aria-label', 'Pujar');
   const down = button('↓', () => move(1)); down.disabled = index === list.length - 1; down.setAttribute('aria-label', 'Baixar');
-  const remove = button('Eliminar', () => {
+  const remove = button(compact ? '×' : 'Eliminar', () => {
     if (!window.confirm(removeLabel)) return;
     list.splice(index, 1); changed(); render();
   }, 'delete');
+  remove.setAttribute('aria-label', 'Eliminar'); remove.title = 'Eliminar';
+  up.title = 'Pujar'; down.title = 'Baixar';
   tools.append(up, down, remove); return tools;
 }
 function card(title, list, index, kind, path) {
+  const row = el('div', 'card-row');
   const node = el('details', `card ${kind}-card`); node.dataset.cardPath = path;
   node.contentEntry = list[index]; node.open = expandedCards.has(node.contentEntry);
   const summary = el('summary', '', title || 'Sense títol');
   const body = el('div', 'card-body');
-  body.append(moveControls(list, index, kind === 'table' ? 'Vols eliminar esta taula i tots els seus ítems?' : 'Vols eliminar este element?'));
+  const controls = moveControls(list, index, kind === 'table' ? 'Vols eliminar esta taula i tots els seus ítems?' : 'Vols eliminar este element?', true);
+  controls.dataset.controlsFor = path;
   node.append(summary, body);
-  return { node, body, summary };
+  row.append(node, controls);
+  return { node, body, summary, row };
 }
 const emptyPrice = () => ({ kind: 'amount', amount: 0, description: [], star: false, bold: true, italic: false });
 const emptyItem = () => ({ name: '', color: 'mustard', description: [], alert: [], prices: [emptyPrice()] });
@@ -174,23 +183,36 @@ function renderPrices(item, path) {
   item.prices.forEach((price, index) => {
     const pp = `${path}.${index}`, block = el('div', 'price'); block.dataset.pricePath = pp;
     const heading = el('h3', '', `Preu ${index + 1}`); block.append(heading, moveControls(item.prices, index, 'Vols eliminar este preu?'));
-    const grid = el('div', 'price-grid');
-    const select = el('select');
-    for (const [value, label] of [['amount', 'Import'], ['text', 'Text']]) { const option = el('option', '', label); option.value = value; select.append(option); }
-    select.value = price.kind;
-    select.addEventListener('change', () => {
-      price.kind = select.value;
-      if (price.kind === 'amount') { price.amount = 0; delete price.text; }
-      else { price.text = ''; delete price.amount; }
-      changed(); render();
-    });
-    grid.append(field('Tipus', `${pp}.kind`, select));
+    const toggle = el('div', 'price-type-toggle');
+    toggle.setAttribute('role', 'group'); toggle.setAttribute('aria-label', 'Tipus de preu');
+    for (const [kind, label] of [['amount', 'Import (€)'], ['text', 'Text curt']]) {
+      const option = button(label, () => {
+        if (price.kind === kind) return;
+        price.kind = kind;
+        if (kind === 'amount') { price.amount = 0; delete price.text; }
+        else { price.text = ''; delete price.amount; }
+        changed(); render();
+      });
+      option.setAttribute('aria-pressed', String(price.kind === kind)); toggle.append(option);
+    }
+    let valueField;
     if (price.kind === 'amount') {
       const display = typeof price.amount === 'number' ? String(price.amount / 100).replace('.', ',') : price.amount;
-      const amount = textField('Import (€)', display ?? '', `${pp}.amount`, value => { price.amount = parseAmount(value) ?? value; }, 10);
-      amount.querySelector('input').inputMode = 'decimal'; grid.append(amount);
-    } else grid.append(textField('Text curt', price.text, `${pp}.text`, value => { price.text = value; }, 80));
-    block.append(grid);
+      const input = el('input'); input.type = 'text'; input.inputMode = 'decimal'; input.maxLength = 10;
+      input.value = display ?? '0';
+      const validInput = value => /^\d{0,7}(?:[.,]\d{0,2})?$/.test(value);
+      input.addEventListener('input', () => {
+        if (!validInput(input.value)) input.value = '0';
+        let number = input.value.replace(/[.,]$/, '');
+        if (/^[.,]/.test(number)) number = `0${number}`;
+        price.amount = parseAmount(number) ?? 0;
+        changed();
+      });
+      input.addEventListener('blur', () => { input.value = String(price.amount / 100).replace('.', ','); });
+      valueField = field('Import (€)', `${pp}.amount`, input);
+    } else valueField = textField('Text curt', price.text, `${pp}.text`, value => { price.text = value; }, 80);
+    valueField.querySelector('label').classList.add('visually-hidden');
+    valueField.classList.add('price-value-field'); valueField.prepend(toggle); block.append(valueField);
     const controls = el('div', 'price-controls');
     controls.append(checkbox('Asterisc', price.star, value => { price.star = value; refreshFootnoteHint(); }), checkbox('Negreta', price.bold, value => { price.bold = value; }), checkbox('Cursiva', price.italic, value => { price.italic = value; }));
     block.append(controls, richField('Descripció del preu (opcional)', price.description, `${pp}.description`, value => { price.description = value; }));
@@ -211,7 +233,7 @@ function renderTables(category, ci) {
   const container = el('div', 'collection');
   category.tables.forEach((table, ti) => {
     const tp = `categories.${ci}.tables.${ti}`;
-    const { node, body, summary } = card(table.title, category.tables, ti, 'table', tp);
+    const { row, body, summary } = card(table.title, category.tables, ti, 'table', tp);
     body.append(textField('Títol de la taula', table.title, `${tp}.title`, value => { table.title = value; summary.lastChild.textContent = value || 'Sense títol'; }));
     const items = el('div', 'collection');
     table.items.forEach((item, ii) => {
@@ -229,13 +251,13 @@ function renderTables(category, ci) {
       colorField.append(colors);
       entry.body.append(colorField, richField('Descripció (opcional)', item.description, `${ip}.description`, value => { item.description = value; }), richField('Alerta (opcional)', item.alert, `${ip}.alert`, value => { item.alert = value; }), renderPrices(item, `${ip}.prices`));
       const pending = pendingControl(item); if (pending) entry.body.prepend(pending);
-      items.append(entry.node);
+      items.append(entry.row);
     });
     body.append(items, button('+ Afegir ítem', () => { table.items.push(emptyItem()); changed(); render(); }, 'add'));
     const footnote = richField('Nota dels asteriscos', table.footnote, `${tp}.footnote`, value => { table.footnote = value; });
     footnote.classList.add('section-divider');
     const hint = el('p', 'footnote-hint'); hint.dataset.footnoteHint = `${ci}:${ti}`;
-    body.append(footnote, hint); container.append(node);
+    body.append(footnote, hint); container.append(row);
   });
   container.append(button('+ Afegir taula', () => { category.tables.push({ title: '', footnote: [], items: [emptyItem()] }); changed(); render(); }, 'add'));
   return container;
@@ -244,10 +266,10 @@ function renderQuestions(category, ci) {
   const container = el('div', 'collection');
   category.questions.forEach((question, qi) => {
     const qp = `categories.${ci}.questions.${qi}`;
-    const { node, body, summary } = card(textOf(question.question), category.questions, qi, 'question', qp);
+    const { row, body, summary } = card(textOf(question.question), category.questions, qi, 'question', qp);
     body.append(richField('Pregunta', question.question, `${qp}.question`, value => { question.question = value; summary.lastChild.textContent = textOf(value) || 'Sense títol'; }), richField('Resposta', question.answer, `${qp}.answer`, value => { question.answer = value; }));
     const pending = pendingControl(question); if (pending) body.prepend(pending);
-    container.append(node);
+    container.append(row);
   });
   container.append(button('+ Afegir pregunta', () => { category.questions.push({ question: [], answer: [] }); changed(); render(); }, 'add'));
   return container;
@@ -259,13 +281,17 @@ function downloadDraft() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 async function reloadCurrent() {
-  if (dirty && !confirm('Vols descartar els canvis locals i carregar la versió actual? Pots descarregar abans l’esborrany.')) return;
+  if (busy) return;
+  if (dirty && !confirm('Vols esborrar l’esborrany i carregar el contingut actual? Els canvis sense guardar es perdran.')) return;
+  busy = true; updateSave(); document.querySelector('.layout').inert = true; setStatus('Carregant la versió actual…');
   try {
     const result = await requestContent();
     latest = result; content = clone(result.document); base = clone(result.document); sha = result.sha;
     conflicted = false; dirty = false; persistDraft(); render(); setStatus('Versió actual carregada');
   } catch (error) { setStatus(error.message); }
+  finally { busy = false; document.querySelector('.layout').inert = false; updateSave(); }
 }
+resetButton.addEventListener('click', reloadCurrent);
 function notices() {
   if (!WORKER_URL) { const notice = el('div', 'notice'); notice.append(el('p', '', 'El guardat encara no està disponible. Pots provar l’edició.')); main.append(notice); }
   if (localWarning) main.append(el('p', 'notice', localWarning));

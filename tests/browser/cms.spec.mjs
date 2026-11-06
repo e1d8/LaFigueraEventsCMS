@@ -11,7 +11,7 @@ async function api(page, options = {}) {
     const request = route.request();
     const headers = { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'authorization, content-type', 'content-type': 'application/json' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
-    if (request.method() === 'GET') return route.fulfill({ headers, body: JSON.stringify({ document: seed, sha: options.sha || SHA }) });
+    if (request.method() === 'GET') return route.fulfill({ headers, body: JSON.stringify({ document: options.document || seed, sha: options.sha || SHA }) });
     calls.push({ body: request.postDataJSON(), authorization: request.headers().authorization });
     if (options.onSave) return options.onSave(route, headers, calls);
     return route.fulfill({ headers, body: JSON.stringify({ sha: NEXT, commit: COMMIT }) });
@@ -130,8 +130,8 @@ test('Preus, colors, nous elements i notes obligatòries', async ({ page }) => {
   await expect(page.getByText('Ompli la nota: hi ha preus amb asterisc.', { exact: true }).first()).toBeVisible();
   await table.getByRole('textbox', { name: 'Nota dels asteriscos' }).fill('Sense IVA.');
   await item.getByRole('button', { name: '+ Afegir preu', exact: true }).click();
-  await expect(item.getByRole('combobox')).toHaveCount(3);
-  await item.getByRole('combobox').last().selectOption('text');
+  await expect(item.getByRole('group', { name: 'Tipus de preu', exact: true })).toHaveCount(3);
+  await item.getByRole('button', { name: 'Text curt', exact: true }).last().click();
   await item.getByRole('textbox', { name: 'Text curt' }).fill('Consulta’ns');
   await acceptSave(page);
   await expect(page.locator('#save-state')).toHaveText('Canvis guardats. Es publicaran en breu.');
@@ -161,7 +161,7 @@ test('Afegir, ordenar i eliminar taules i preguntes', async ({ page }) => {
   await page.getByRole('button', { name: '+ Afegir taula', exact: true }).click();
   const table = page.locator('[data-card-path="categories.2.tables.1"]'); await table.locator(':scope > summary').click();
   await table.getByRole('textbox', { name: 'Títol de la taula' }).fill('Nova taula');
-  await table.locator(':scope > .card-body > .card-tools').getByRole('button', { name: 'Pujar', exact: true }).click();
+  await page.locator('[data-controls-for="categories.2.tables.1"]').getByRole('button', { name: 'Pujar', exact: true }).click();
   await expect(page.locator('[data-card-path="categories.2.tables.0"] > summary')).toHaveText('Nova taula');
   await expect(page.locator('[data-card-path="categories.2.tables.0"]')).toHaveAttribute('open', '');
   await page.getByRole('button', { name: '+ Afegir pregunta', exact: true }).click();
@@ -169,7 +169,7 @@ test('Afegir, ordenar i eliminar taules i preguntes', async ({ page }) => {
   await question.getByRole('textbox', { name: 'Pregunta', exact: true }).fill('Pregunta nova?');
   await question.getByRole('textbox', { name: 'Resposta', exact: true }).fill('Resposta nova.');
   page.once('dialog', dialog => dialog.accept());
-  await question.getByRole('button', { name: 'Eliminar', exact: true }).click();
+  await page.locator('[data-controls-for="categories.2.questions.3"]').getByRole('button', { name: 'Eliminar', exact: true }).click();
   await expect(page.locator('[data-card-path="categories.2.questions.3"]')).toHaveCount(0);
 });
 
@@ -180,4 +180,74 @@ test('Mòbil: navegació i camps no desborden la pantalla', async ({ page }) => 
   await page.locator('[data-card-path="categories.1.tables.0.items.0"] > summary').click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await expect(page.locator('#save')).toBeVisible();
+});
+
+test('Restablir esborra l’esborrany i carrega la versió actual; cancel·lar el conserva', async ({ page }) => {
+  const remote = structuredClone(seed);
+  await api(page, { document: remote }); await page.goto('/'); await editHome(page, 'Esborrany local');
+  await expect(page.locator('.brand small')).toHaveText('EVENTS CMS');
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'Restablir', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Descripció' })).toHaveText('Esborrany local');
+  expect(await page.evaluate(() => Object.values(localStorage).join(''))).toContain('Esborrany local');
+  remote.home.description = [{ text: 'Contingut actualitzat en la web' }];
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Restablir', exact: true }).click();
+  await expect(page.locator('#save-state')).toHaveText('Versió actual carregada');
+  await expect(page.getByRole('textbox', { name: 'Descripció' })).toHaveText('Contingut actualitzat en la web');
+  expect(await page.evaluate(() => Object.values(localStorage).join(''))).toBe('');
+  await expect(page.locator('#save')).toBeDisabled();
+  await page.reload(); await page.getByRole('button', { name: 'Inici', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Descripció' })).toHaveText('Contingut actualitzat en la web');
+});
+
+test('Si falla la recàrrega, Restablir conserva el treball local', async ({ page }) => {
+  await api(page); await page.goto('/'); await editHome(page, 'No perdem este esborrany');
+  await page.route('https://cms-api.test/content', route => route.fulfill({ status: 502, json: { error: 'No s’ha pogut carregar el contingut.' }, headers: { 'access-control-allow-origin': origin } }));
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Restablir', exact: true }).click();
+  await expect(page.locator('#save-state')).toHaveText('No s’ha pogut carregar el contingut.');
+  await expect(page.getByRole('textbox', { name: 'Descripció' })).toHaveText('No perdem este esborrany');
+  expect(await page.evaluate(() => Object.values(localStorage).join(''))).toContain('No perdem este esborrany');
+  await expect(page.locator('#reset')).toBeEnabled();
+});
+
+test('Els controls externs funcionen sense desplegar taules, ítems ni preguntes', async ({ page }) => {
+  await api(page); await page.goto('/'); await page.getByRole('button', { name: 'Tartes nupcials', exact: true }).click();
+  const table = page.locator('[data-card-path="categories.0.tables.0"]');
+  await expect(table).not.toHaveAttribute('open', '');
+  await expect(page.locator('[data-controls-for="categories.0.tables.0"]').getByRole('button', { name: 'Baixar', exact: true })).toBeVisible();
+  await table.locator(':scope > summary').click();
+  const itemControls = page.locator('[data-controls-for="categories.0.tables.0.items.0"]');
+  await expect(itemControls.getByRole('button', { name: 'Eliminar', exact: true })).toBeVisible();
+  await itemControls.getByRole('button', { name: 'Baixar', exact: true }).click();
+  await expect(page.locator('[data-card-path="categories.0.tables.0.items.1"] > summary')).toHaveText('Carrot cake');
+  await expect(page.locator('[data-card-path="categories.0.tables.0.items.1"]')).not.toHaveAttribute('open', '');
+  const questionControls = page.locator('[data-controls-for="categories.0.questions.0"]');
+  await questionControls.getByRole('button', { name: 'Baixar', exact: true }).click();
+  await expect(page.locator('[data-card-path="categories.0.questions.1"] > summary')).toHaveText('Què inclou el preu?');
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('[data-controls-for="categories.0.questions.1"]').getByRole('button', { name: 'Eliminar', exact: true }).click();
+  await expect(page.locator('.question-card > summary').filter({ hasText: 'Què inclou el preu?' })).toHaveCount(0);
+});
+
+test('El commutador de preus limita els imports i permet text lliure', async ({ page }) => {
+  const calls = await api(page); await page.goto('/'); await page.getByRole('button', { name: 'Tartes nupcials', exact: true }).click();
+  await page.locator('[data-card-path="categories.0.tables.0"] > summary').click();
+  const item = page.locator('[data-card-path="categories.0.tables.0.items.0"]'); await item.locator(':scope > summary').click();
+  const first = item.locator('.price').first(), second = item.locator('.price').nth(1);
+  await expect(first.getByRole('button', { name: 'Import (€)', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(first.getByRole('button', { name: 'Text curt', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  const amount = first.getByRole('textbox', { name: 'Import (€)', exact: true });
+  await amount.fill('12,30'); await expect(amount).toHaveValue('12,30');
+  await amount.press('End'); await amount.pressSequentially('abc'); await expect(amount).toHaveValue('0');
+  await amount.fill('no és un número'); await expect(amount).toHaveValue('0');
+  await amount.fill('1,2.3'); await expect(amount).toHaveValue('0');
+  await amount.fill('12.50');
+  await second.getByRole('button', { name: 'Text curt', exact: true }).click();
+  await expect(second.getByRole('button', { name: 'Text curt', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await second.getByRole('textbox', { name: 'Text curt', exact: true }).fill('Consulta’ns: 12 € / a mida!');
+  await acceptSave(page); await expect(page.locator('#save-state')).toContainText('Canvis guardats');
+  expect(calls[0].body.document.categories[0].tables[0].items[0].prices[0].amount).toBe(1250);
+  expect(calls[0].body.document.categories[0].tables[0].items[0].prices[1].text).toBe('Consulta’ns: 12 € / a mida!');
 });

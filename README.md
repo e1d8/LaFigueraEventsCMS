@@ -118,11 +118,12 @@ Guarda el fitxer. En GitHub Desktop, fes commit i push dels canvis del CMS. Espe
 ## Ús quotidià
 
 - Selecciona una secció i edita els camps. Els grups de taules, ítems i preguntes es poden desplegar.
-- Els botons **↑ / ↓** canvien l’ordre dins del grup. **Eliminar** demana confirmació.
+- Els botons **↑ / ↓** canvien l’ordre dins del grup. En taules, ítems i preguntes estan a la dreta, fora del desplegable. **×** elimina l’element després de demanar confirmació.
 - En un text, selecciona les paraules i polsa **B**, **I** o **Enllaç**. Per separar línies, polsa Intro. El text apegat entra sense format extern.
-- Cada preu pot ser un **Import**, que rep el símbol € automàticament, o un **Text** curt. Cada preu té la seua descripció i el seu asterisc.
+- El commutador de cada preu permet triar **Import (€)** o **Text curt**. Els imports només accepten dígits i un separador decimal, coma o punt; una entrada no vàlida queda a zero. El símbol € s’afegix automàticament. En **Text curt** pots escriure lliurement. Cada preu té la seua descripció i el seu asterisc.
 - Si hi ha un asterisc, ompli la nota de la taula. Sense asteriscs, la nota no es mostra.
 - Les modificacions es conserven localment en eixe navegador fins a guardar. La contrasenya només s’utilitza per a l’enviament i es buida després.
+- **Restablir** descarta l’esborrany local després de confirmar i torna a carregar el contingut actual de GitHub. Si falla la connexió, conserva l’esborrany perquè no perdes el treball. No modifica la web ni demana contrasenya.
 - Si una altra persona ha guardat abans, el CMS bloqueja el guardat. Descarrega l’esborrany, carrega la versió actual i torna a aplicar els canvis necessaris. La descàrrega és una còpia de consulta, no una importació automàtica.
 
 ## Manteniment
