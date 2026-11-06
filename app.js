@@ -324,10 +324,27 @@ function showErrors(errors) {
   if (entry) { entry.control.focus(); entry.wrapper.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
 }
 
+function contentEndpoint() {
+  let url;
+  try { url = new URL(WORKER_URL); } catch { /* Report configuration errors before fetching a relative HTML page. */ }
+  if (!url || !['https:', 'http:'].includes(url.protocol) || url.protocol === 'http:' && !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname) || url.username || url.password || !['', '/'].includes(url.pathname) || url.search || url.hash) {
+    throw new Error('Revisa la URL del Worker: ha de començar per https:// i no portar /content al final.');
+  }
+  return `${url.origin}/content`;
+}
+
+async function readResponse(response) {
+  let result;
+  try { result = await response.json(); }
+  catch { throw new Error('El servei no ha retornat JSON. Revisa que la URL configurada siga la del Worker.'); }
+  if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error('El servei ha retornat una resposta no compatible.');
+  return result;
+}
+
 async function requestContent() {
-  const url = WORKER_URL ? `${WORKER_URL.replace(/\/$/, '')}/content` : './sample-content.json';
+  const url = WORKER_URL ? contentEndpoint() : './sample-content.json';
   const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(20000) });
-  const result = await response.json();
+  const result = await readResponse(response);
   if (!response.ok) throw new Error(result.error || 'No s’ha pogut carregar el contingut.');
   const loaded = WORKER_URL ? result : { document: result, sha: null };
   if (validateContent(loaded.document).length || WORKER_URL && !/^[a-f0-9]{40,64}$/.test(loaded.sha)) throw new Error('El contingut no té un format compatible.');
@@ -373,11 +390,11 @@ passwordForm.addEventListener('submit', async event => {
   setStatus('Guardant…');
   try {
     const password = btoa(Array.from(new TextEncoder().encode(passwordInput.value), byte => String.fromCharCode(byte)).join('')); passwordInput.value = '';
-    const response = await fetch(`${WORKER_URL.replace(/\/$/, '')}/content`, {
+    const response = await fetch(contentEndpoint(), {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${password}` },
       body: JSON.stringify({ document: content, sha }), signal: AbortSignal.timeout(40000),
     });
-    const result = await response.json();
+    const result = await readResponse(response);
     if (!response.ok) {
       if (response.status === 409) { conflicted = true; passwordDialog.close(); render(); }
       if (result.errors) { passwordDialog.close(); showErrors(result.errors); }

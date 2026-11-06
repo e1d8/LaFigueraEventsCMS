@@ -42,6 +42,35 @@ test('Inici té un únic text amb salutació, format i esborrany recuperable', a
   expect(saved).not.toContain('contrasenya');
 });
 
+test('Una URL sense https mostra un error clar i no demana HTML al CMS', async ({ page }) => {
+  const requests = [];
+  page.on('request', request => requests.push(request.url()));
+  await page.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: "export const WORKER_URL = 'la-figuera-events-cms.devkkel.workers.dev';" }));
+  await page.goto('/');
+  await expect(page.locator('#main .error')).toContainText('ha de començar per https://');
+  await expect(page.getByRole('button', { name: 'Reintentar' })).toBeVisible();
+  expect(requests.some(url => url.includes('devkkel.workers.dev/content'))).toBe(false);
+});
+
+test('Una resposta HTML mostra un missatge clar i permet reintentar', async ({ page }) => {
+  await api(page);
+  let html = true;
+  await page.route('https://cms-api.test/content', route => route.fulfill(html ? { status: 404, contentType: 'text/html', body: '<!DOCTYPE html><html><body>No trobat</body></html>', headers: { 'access-control-allow-origin': origin } } : { json: { document: seed, sha: SHA }, headers: { 'access-control-allow-origin': origin } }));
+  await page.goto('/');
+  await expect(page.locator('#main .error')).toHaveText('El servei no ha retornat JSON. Revisa que la URL configurada siga la del Worker.');
+  html = false;
+  await page.getByRole('button', { name: 'Reintentar' }).click();
+  await expect(page.getByRole('button', { name: 'Inici', exact: true })).toBeVisible();
+});
+
+test('Una resposta HTML en guardar conserva l’esborrany i no confirma el canvi', async ({ page }) => {
+  await api(page, { onSave: (route, headers) => route.fulfill({ status: 502, headers, body: '<!DOCTYPE html><html><body>Error</body></html>' }) });
+  await page.goto('/'); await editHome(page); await acceptSave(page);
+  await expect(page.locator('#password-error')).toContainText('El servei no ha retornat JSON.');
+  expect(await page.evaluate(() => Object.values(localStorage).join(''))).toContain('Una descripció nova');
+  await expect(page.locator('#save-state')).not.toHaveText('Canvis guardats. Es publicaran en breu.');
+});
+
 test('Guardar demana contrasenya i espera la confirmació; no duplica enviaments', async ({ page }) => {
   let release, received;
   const waiting = new Promise(resolve => { received = resolve; });
