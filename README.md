@@ -162,6 +162,7 @@ Comprova un guardat i revoca el token anterior en GitHub.
 | --- | --- |
 | El guardat encara no està disponible | Falta posar la URL del Worker en `config.js` i publicar el canvi. |
 | Revisa la URL del Worker / El servei no ha retornat JSON | La URL ha d’incloure `https://`, per exemple `https://la-figuera-events-cms.el-teu-subdomini.workers.dev`, sense `/content` al final. |
+| Encara apareix `Unexpected token '<'` després d’actualitzar | Comprova que obris la URL correcta del CMS. Publica també `index.html` i `app.js`, que forcen la renovació de l’aplicació i la configuració; espera la publicació i prova en una finestra privada. |
 | No es pot carregar el contingut | Comprova URL del Worker, secrets, `ALLOWED_ORIGIN` i que el JSON ja estiga publicat en `main`. |
 | La contrasenya no és correcta | Utilitza la de `CMS_PASSWORD`, no la de GitHub. |
 | Massa intents | Espera un minut abans de tornar a guardar. El límit és per IP i ubicació de Cloudflare. |

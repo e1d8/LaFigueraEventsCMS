@@ -1,6 +1,8 @@
-import { WORKER_URL } from './config.js';
 import { validateContent, COLORS, rich, textOf, parseAmount, safeLink, CONTACT_IDS } from './shared/content-model.js';
 import { appendRich, readRich } from './shared/rich-text.js';
+
+// Always reload deployment configuration, even if an earlier URL is still in the browser cache.
+const { WORKER_URL } = await import(`./config.js?v=${Date.now()}`);
 
 const main = document.querySelector('#main');
 const navigation = document.querySelector('#navigation');

@@ -6,7 +6,7 @@ const origin = 'http://127.0.0.1:43179';
 
 async function api(page, options = {}) {
   const calls = [];
-  await page.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: "export const WORKER_URL = 'https://cms-api.test';" }));
+  await page.route(/\/config\.js(?:\?.*)?$/, route => route.fulfill({ contentType: 'text/javascript', body: "export const WORKER_URL = 'https://cms-api.test';" }));
   await page.route('https://cms-api.test/content', async route => {
     const request = route.request();
     const headers = { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'authorization, content-type', 'content-type': 'application/json' };
@@ -45,7 +45,7 @@ test('Inici té un únic text amb salutació, format i esborrany recuperable', a
 test('Una URL sense https mostra un error clar i no demana HTML al CMS', async ({ page }) => {
   const requests = [];
   page.on('request', request => requests.push(request.url()));
-  await page.route('**/config.js', route => route.fulfill({ contentType: 'text/javascript', body: "export const WORKER_URL = 'la-figuera-events-cms.devkkel.workers.dev';" }));
+  await page.route(/\/config\.js(?:\?.*)?$/, route => route.fulfill({ contentType: 'text/javascript', body: "export const WORKER_URL = 'la-figuera-events-cms.devkkel.workers.dev';" }));
   await page.goto('/');
   await expect(page.locator('#main .error')).toContainText('ha de començar per https://');
   await expect(page.getByRole('button', { name: 'Reintentar' })).toBeVisible();
